@@ -1,6 +1,6 @@
 const yesButton = document.getElementById('yesButton');
 yesButton.addEventListener('mouseover', function(event) {
-    const distance = 100; // radius in pixels within which the button will move
+    const distance = 350; // radius in pixels within which the button will move
     const angle = Math.random() * Math.PI * 2; // random angle
     const x = Math.cos(angle) * distance + event.clientX - this.clientWidth / 2;
     const y = Math.sin(angle) * distance + event.clientY - this.clientHeight / 2;
