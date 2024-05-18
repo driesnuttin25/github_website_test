@@ -1,21 +1,67 @@
-const yesButton = document.getElementById('yesButton');
-yesButton.addEventListener('mouseover', function(event) {
-    const distance = 350; // radius in pixels within which the button will move
-    const angle = Math.random() * Math.PI * 2; // random angle
-    const x = Math.cos(angle) * distance + event.clientX - this.clientWidth / 2;
-    const y = Math.sin(angle) * distance + event.clientY - this.clientHeight / 2;
-    this.style.position = 'absolute';
-    this.style.left = Math.min(Math.max(0, x), window.innerWidth - this.clientWidth) + 'px';
-    this.style.top = Math.min(Math.max(0, y), window.innerHeight - this.clientHeight) + 'px';
-});
+// Your web app's Firebase configuration
+var firebaseConfig = {
+  apiKey: "AIzaSyCWSBStmBWQA8IzZtEyxeb2tco0xXVhpsg",
+  authDomain: "project-katara.firebaseapp.com",
+  projectId: "project-katara",
+  storageBucket: "project-katara.appspot.com",
+  messagingSenderId: "7288655338",
+  appId: "1:7288655338:web:06b74e8aa116e677a07693"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
 
-document.getElementById('noButton').addEventListener('click', function() {
-    document.body.innerHTML = ''; // Clear the page content
-    const img = document.createElement('img');
-    img.src = 'in_love.jpg'; // Path to your image
-    img.style.width = '80%'; // Larger image
-    img.style.position = 'absolute';
-    img.style.left = '10%';
-    img.style.top = '10%';
-    document.body.appendChild(img);
+document.addEventListener("DOMContentLoaded", function() {
+  var ctx = document.getElementById('humidityChart').getContext('2d');
+  var humidityChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [], // Time labels
+      datasets: [{
+        label: 'Humidity',
+        data: [], // Humidity data
+        backgroundColor: 'rgba(0, 150, 136, 0.2)',
+        borderColor: 'rgba(0, 150, 136, 1)',
+        borderWidth: 2,
+        fill: true
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          type: 'time',
+          time: {
+            unit: 'minute'
+          },
+          title: {
+            display: true,
+            text: 'Time'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Humidity (%)'
+          },
+          suggestedMin: 0,
+          suggestedMax: 100
+        }
+      }
+    }
+  });
+
+  // Fetch data from Firestore
+  db.collection("humidity").orderBy("createTime").onSnapshot((querySnapshot) => {
+    var labels = [];
+    var data = [];
+    querySnapshot.forEach((doc) => {
+      var timestamp = doc.data().createTime.seconds * 1000;
+      labels.push(new Date(timestamp));
+      data.push(doc.data().humidity.integerValue);
+    });
+
+    humidityChart.data.labels = labels;
+    humidityChart.data.datasets[0].data = data;
+    humidityChart.update();
+  });
 });
