@@ -55,9 +55,12 @@ document.addEventListener("DOMContentLoaded", function() {
     var labels = [];
     var data = [];
     querySnapshot.forEach((doc) => {
-      var timestamp = doc.data().createTime.seconds * 1000;
-      labels.push(new Date(timestamp));
-      data.push(doc.data().humidity.integerValue);
+      var createTime = doc.data().createTime;
+      if (createTime) {
+        var timestamp = createTime.seconds * 1000;
+        labels.push(new Date(timestamp));
+        data.push(doc.data().humidity.integerValue);
+      }
     });
 
     humidityChart.data.labels = labels;
