@@ -55,11 +55,12 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Fetch data from Firestore
-  db.collection("humidity").orderBy("createTime").onSnapshot((querySnapshot) => {
+    db.collection("humidity").orderBy("createTime").onSnapshot((querySnapshot) => {
     var labels = [];
     var data = [];
     querySnapshot.forEach((doc) => {
       var createTime = doc.data().createTime;
+      console.log(doc.data()); // Log document data
       if (createTime && createTime.seconds) {
         var timestamp = createTime.seconds * 1000;
         labels.push(new Date(timestamp));
@@ -67,10 +68,13 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
 
+    console.log(labels, data); // Log the labels and data arrays
+
     if (labels.length > 0 && data.length > 0) {
       humidityChart.data.labels = labels;
       humidityChart.data.datasets[0].data = data;
       humidityChart.update();
     }
   });
+
 });
