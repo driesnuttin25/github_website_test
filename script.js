@@ -12,14 +12,17 @@ firebase.initializeApp(firebaseConfig);
 var db = firebase.firestore();
 
 document.addEventListener("DOMContentLoaded", function() {
-  var ctx = document.getElementById('humidityChart').getContext('2d');
-  var humidityChart = new Chart(ctx, {
+  var moistureCtx = document.getElementById('moistureChart').getContext('2d');
+  var temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
+  var conductivityCtx = document.getElementById('conductivityChart').getContext('2d');
+
+  var moistureChart = new Chart(moistureCtx, {
     type: 'line',
     data: {
-      labels: [], // Time labels
+      labels: [],
       datasets: [{
-        label: 'Humidity',
-        data: [], // Humidity data
+        label: 'Moisture',
+        data: [],
         backgroundColor: 'rgba(0, 150, 136, 0.2)',
         borderColor: 'rgba(0, 150, 136, 1)',
         borderWidth: 2,
@@ -32,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
           type: 'time',
           time: {
             unit: 'minute',
-            stepSize: 5, // Adjusted step size to handle a wider range of dates
+            stepSize: 5,
             displayFormats: {
               minute: 'HH:mm'
             }
@@ -45,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
         y: {
           title: {
             display: true,
-            text: 'Humidity (%)'
+            text: 'Moisture (%)'
           },
           suggestedMin: 0,
           suggestedMax: 100
@@ -54,23 +57,138 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  // Fetch data from Firestore
-  db.collection("humidity").orderBy("createTime").onSnapshot((querySnapshot) => {
-    var labels = [];
-    var data = [];
+  var temperatureChart = new Chart(temperatureCtx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Temperature',
+        data: [],
+        backgroundColor: 'rgba(0, 100, 50, 0.2)',
+        borderColor: 'rgba(0, 100, 50, 1)',
+        borderWidth: 2,
+        fill: true
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          type: 'time',
+          time: {
+            unit: 'minute',
+            stepSize: 5,
+            displayFormats: {
+              minute: 'HH:mm'
+            }
+          },
+          title: {
+            display: true,
+            text: 'Time'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Temperature (°C)'
+          },
+          suggestedMin: 0,
+          suggestedMax: 100
+        }
+      }
+    }
+  });
+
+  var conductivityChart = new Chart(conductivityCtx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Conductivity',
+        data: [],
+        backgroundColor: 'rgba(0, 50, 25, 0.2)',
+        borderColor: 'rgba(0, 50, 25, 1)',
+        borderWidth: 2,
+        fill: true
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          type: 'time',
+          time: {
+            unit: 'minute',
+            stepSize: 5,
+            displayFormats: {
+              minute: 'HH:mm'
+            }
+          },
+          title: {
+            display: true,
+            text: 'Time'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Conductivity (dS/m)'
+          },
+          suggestedMin: 0,
+          suggestedMax: 100
+        }
+      }
+    }
+  });
+
+  db.collection("sensorData").orderBy("createTime").onSnapshot((querySnapshot) => {
+    var moistureLabels = [];
+    var moistureData = [];
+    var temperatureLabels = [];
+    var temperatureData = [];
+    var conductivityLabels = [];
+    var conductivityData = [];
+    
     querySnapshot.forEach((doc) => {
       var createTime = doc.data().createTime;
       if (createTime && createTime.seconds && createTime.seconds > 1000000000) { // Ignore timestamps before ~2001
         var timestamp = createTime.seconds * 1000;
-        labels.push(new Date(timestamp));
-        data.push(doc.data().humidity);
+        var moisture = doc.data().moisture;
+        var temperature = doc.data().temperature;
+        var conductivity = doc.data().conductivity;
+        
+        if (moisture != null) {
+          moistureLabels.push(new Date(timestamp));
+          moistureData.push(moisture);
+        }
+        if (temperature != null) {
+          temperatureLabels.push(new Date(timestamp));
+          temperatureData.push(temperature);
+        }
+        if (conductivity != null) {
+          conductivityLabels.push(new Date(timestamp));
+          conductivityData.push(conductivity);
+        }
       }
     });
 
-    if (labels.length > 0 && data.length > 0) {
-      humidityChart.data.labels = labels;
-      humidityChart.data.datasets[0].data = data;
-      humidityChart.update();
+    // Update Moisture Chart
+    if (moistureLabels.length > 0 && moistureData.length > 0) {
+      moistureChart.data.labels = moistureLabels;
+      moistureChart.data.datasets[0].data = moistureData;
+      moistureChart.update();
+    }
+
+    // Update Temperature Chart
+    if (temperatureLabels.length > 0 && temperatureData.length > 0) {
+      temperatureChart.data.labels = temperatureLabels;
+      temperatureChart.data.datasets[0].data = temperatureData;
+      temperatureChart.update();
+    }
+
+    // Update Conductivity Chart
+    if (conductivityLabels.length > 0 && conductivityData.length > 0) {
+      conductivityChart.data.labels = conductivityLabels;
+      conductivityChart.data.datasets[0].data = conductivityData;
+      conductivityChart.update();
     }
   });
 });
