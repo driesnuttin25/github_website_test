@@ -12,18 +12,32 @@
 <body>
   <header>
     <h1>Project Katara</h1>
+    <nav>
+      <a href="#moisture">Moisture</a>
+      <a href="#temperature">Temperature</a>
+      <a href="#conductivity">Conductivity</a>
+    </nav>
   </header>
-  <main>
-    <div class="chart-container">
+  <section id="plant-section">
+    <!-- Add any plant-related content or images here -->
+  </section>
+  <section id="soil-transition">
+    <!-- Gravel transition section -->
+  </section>
+  <section id="soil-section">
+    <div class="chart-container" id="moisture">
+      <h2>Moisture</h2>
       <canvas id="moistureChart"></canvas>
     </div>
-    <div class="chart-container">
+    <div class="chart-container" id="temperature">
+      <h2>Temperature</h2>
       <canvas id="temperatureChart"></canvas>
     </div>
-    <div class="chart-container">
+    <div class="chart-container" id="conductivity">
+      <h2>Conductivity</h2>
       <canvas id="conductivityChart"></canvas>
     </div>
-  </main>
+  </section>
   <script src="script.js"></script>
 </body>
 </html>
