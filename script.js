@@ -16,10 +16,10 @@ document.addEventListener("DOMContentLoaded", function() {
   var humidityChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: [new Date(), new Date(Date.now() + 60000), new Date(Date.now() + 120000)], // Example time labels
+      labels: [], // Time labels
       datasets: [{
         label: 'Humidity',
-        data: [10, 20, 30], // Example humidity data
+        data: [], // Humidity data
         backgroundColor: 'rgba(0, 150, 136, 0.2)',
         borderColor: 'rgba(0, 150, 136, 1)',
         borderWidth: 2,
@@ -31,7 +31,11 @@ document.addEventListener("DOMContentLoaded", function() {
         x: {
           type: 'time',
           time: {
-            unit: 'minute'
+            unit: 'minute',
+            stepSize: 1,
+            displayFormats: {
+              minute: 'HH:mm'
+            }
           },
           title: {
             display: true,
@@ -63,8 +67,10 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
 
-    humidityChart.data.labels = labels;
-    humidityChart.data.datasets[0].data = data;
-    humidityChart.update();
+    if (labels.length > 0 && data.length > 0) {
+      humidityChart.data.labels = labels;
+      humidityChart.data.datasets[0].data = data;
+      humidityChart.update();
+    }
   });
 });
