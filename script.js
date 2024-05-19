@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var data = [];
     querySnapshot.forEach((doc) => {
       var createTime = doc.data().createTime;
-      if (createTime) {
+      if (createTime && createTime.seconds) {
         var timestamp = createTime.seconds * 1000;
         labels.push(new Date(timestamp));
         data.push(doc.data().humidity.integerValue);
