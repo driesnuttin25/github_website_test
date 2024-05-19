@@ -26,16 +26,30 @@ header nav a {
   font-size: 1.2em;
 }
 
-#plant-section {
-  background-color: #4CAF50; /* Green color for plant section */
-  height: 200px;
+#grass-section {
+  background-color: #4CAF50; /* Green color for grass section */
+  height: 150px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.grass {
+  background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png'); /* Grass texture */
+  width: 100%;
+  height: 100px;
+}
+
+.roots {
+  background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png'); /* Roots texture */
+  width: 100%;
+  height: 50px;
 }
 
 #soil-transition {
-  background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png'); /* Gravel texture */
+  background: url('https://www.transparenttextures.com/patterns/brick-wall.png'); /* Coarse dirt texture */
   height: 50px;
 }
 
