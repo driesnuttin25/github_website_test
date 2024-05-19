@@ -1,16 +1,3 @@
-// Your web app's Firebase configuration
-var firebaseConfig = {
-  apiKey: "AIzaSyCWSBStmBWQA8IzZtEyxeb2tco0xXVhpsg",
-  authDomain: "project-katara.firebaseapp.com",
-  projectId: "project-katara",
-  storageBucket: "project-katara.appspot.com",
-  messagingSenderId: "7288655338",
-  appId: "1:7288655338:web:06b74e8aa116e677a07693"
-};
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-var db = firebase.firestore();
-
 document.addEventListener("DOMContentLoaded", function() {
   var ctx = document.getElementById('humidityChart').getContext('2d');
   var humidityChart = new Chart(ctx, {
@@ -48,23 +35,5 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       }
     }
-  });
-
-  // Fetch data from Firestore
-  db.collection("humidity").orderBy("createTime").onSnapshot((querySnapshot) => {
-    var labels = [];
-    var data = [];
-    querySnapshot.forEach((doc) => {
-      var createTime = doc.data().createTime;
-      if (createTime && createTime.seconds) {
-        var timestamp = createTime.seconds * 1000;
-        labels.push(new Date(timestamp));
-        data.push(doc.data().humidity.integerValue);
-      }
-    });
-
-    humidityChart.data.labels = labels;
-    humidityChart.data.datasets[0].data = data;
-    humidityChart.update();
   });
 });
