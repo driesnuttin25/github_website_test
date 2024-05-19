@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }
   });
-});
 
   // Fetch data from Firestore
   db.collection("humidity").orderBy("createTime").onSnapshot((querySnapshot) => {
