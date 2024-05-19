@@ -7,14 +7,22 @@
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script> <!-- Add this line -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
 <body>
   <header>
     <h1>Project Katara</h1>
   </header>
   <main>
-    <canvas id="humidityChart"></canvas>
+    <div class="chart-container">
+      <canvas id="moistureChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <canvas id="temperatureChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <canvas id="conductivityChart"></canvas>
+    </div>
   </main>
   <script src="script.js"></script>
 </body>
