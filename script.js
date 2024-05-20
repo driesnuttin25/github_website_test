@@ -16,8 +16,40 @@ document.addEventListener("DOMContentLoaded", function() {
   var temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
   var conductivityCtx = document.getElementById('conductivityChart').getContext('2d');
 
-  var moistureChart = new Chart(moistureCtx, {
+  var chartConfig = {
     type: 'line',
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: 'time',
+          time: {
+            unit: 'minute',
+            stepSize: 5,
+            displayFormats: {
+              minute: 'HH:mm'
+            }
+          },
+          title: {
+            display: true,
+            text: 'Time'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Value'
+          },
+          suggestedMin: 0,
+          suggestedMax: 100
+        }
+      }
+    }
+  };
+
+  var moistureChart = new Chart(moistureCtx, {
+    ...chartConfig,
     data: {
       labels: [],
       datasets: [{
@@ -28,37 +60,11 @@ document.addEventListener("DOMContentLoaded", function() {
         borderWidth: 2,
         fill: true
       }]
-    },
-    options: {
-      scales: {
-        x: {
-          type: 'time',
-          time: {
-            unit: 'minute',
-            stepSize: 5,
-            displayFormats: {
-              minute: 'HH:mm'
-            }
-          },
-          title: {
-            display: true,
-            text: 'Time'
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Moisture (%)'
-          },
-          suggestedMin: 0,
-          suggestedMax: 100
-        }
-      }
     }
   });
 
   var temperatureChart = new Chart(temperatureCtx, {
-    type: 'line',
+    ...chartConfig,
     data: {
       labels: [],
       datasets: [{
@@ -69,37 +75,11 @@ document.addEventListener("DOMContentLoaded", function() {
         borderWidth: 2,
         fill: true
       }]
-    },
-    options: {
-      scales: {
-        x: {
-          type: 'time',
-          time: {
-            unit: 'minute',
-            stepSize: 5,
-            displayFormats: {
-              minute: 'HH:mm'
-            }
-          },
-          title: {
-            display: true,
-            text: 'Time'
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Temperature (°C)'
-          },
-          suggestedMin: 0,
-          suggestedMax: 100
-        }
-      }
     }
   });
 
   var conductivityChart = new Chart(conductivityCtx, {
-    type: 'line',
+    ...chartConfig,
     data: {
       labels: [],
       datasets: [{
@@ -110,32 +90,6 @@ document.addEventListener("DOMContentLoaded", function() {
         borderWidth: 2,
         fill: true
       }]
-    },
-    options: {
-      scales: {
-        x: {
-          type: 'time',
-          time: {
-            unit: 'minute',
-            stepSize: 5,
-            displayFormats: {
-              minute: 'HH:mm'
-            }
-          },
-          title: {
-            display: true,
-            text: 'Time'
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Conductivity (dS/m)'
-          },
-          suggestedMin: 0,
-          suggestedMax: 100
-        }
-      }
     }
   });
 
@@ -190,5 +144,12 @@ document.addEventListener("DOMContentLoaded", function() {
       conductivityChart.data.datasets[0].data = conductivityData;
       conductivityChart.update();
     }
+  });
+
+  // Plant selection event
+  document.getElementById('plant-select').addEventListener('change', function() {
+    var selectedPlant = this.value;
+    console.log("Selected plant:", selectedPlant);
+    // Add any additional functionality for selected plant here
   });
 });
