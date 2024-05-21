@@ -3,6 +3,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #f1f1f1; /* Light background for contrast */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 header {
@@ -37,6 +38,7 @@ header nav a {
   justify-content: center;
   position: relative;
   color: #ffffff;
+  width: 100%;
 }
 
 .plant-selection {
@@ -51,6 +53,7 @@ header nav a {
   flex-direction: column;
   align-items: center;
   position: relative;
+  width: 100%;
 }
 
 .chart-container {
@@ -71,6 +74,7 @@ h2 {
 canvas {
   background-color: #5d4037; /* Soil color for chart background */
   border-radius: 8px;
+  max-height: 400px; /* Limit the height of the canvas to prevent sliding */
 }
 
 h1 {
