@@ -1,48 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Project Katara</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <meta charset="UTF-8">
+    <title>Minesweeper Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Project Katara</h1>
-    <nav>
-      <a href="#moisture">Moisture</a>
-      <a href="#temperature">Temperature</a>
-      <a href="#conductivity">Conductivity</a>
-    </nav>
-  </header>
-  <section id="grass-section">
-    <div class="plant-selection">
-      <label for="plant-select">Select Plant:</label>
-      <select id="plant-select">
-        <option value="basil">Basil</option>
-        <option value="parsley">Parsley</option>
-        <option value="cherry-tomato">Cherry Tomato</option>
-        <option value="pepper">Pepper</option>
-      </select>
-    </div>
-  </section>
-  <section id="soil-section">
-    <div class="chart-container" id="moisture">
-      <h2>Moisture</h2>
-      <canvas id="moistureChart"></canvas>
-    </div>
-    <div class="chart-container" id="temperature">
-      <h2>Temperature</h2>
-      <canvas id="temperatureChart"></canvas>
-    </div>
-    <div class="chart-container" id="conductivity">
-      <h2>Conductivity</h2>
-      <canvas id="conductivityChart"></canvas>
-    </div>
-  </section>
-  <script src="script.js"></script>
+    <h1>Minesweeper</h1>
+    <div id="game"></div>
+    <script src="script.js"></script>
 </body>
 </html>
