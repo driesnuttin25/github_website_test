@@ -1,83 +1,48 @@
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f1f1f1; /* Light background for contrast */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-}
-
-header {
-  background-color: #004d40;
-  color: #e0f7fa;
-  padding: 20px;
-  text-align: center;
-  width: 100%;
-  z-index: 1000;
-  position: sticky;
-  top: 0;
-}
-
-header nav {
-  margin-top: 10px;
-}
-
-header nav a {
-  color: #e0f7fa;
-  text-decoration: none;
-  margin: 0 15px;
-  font-size: 1.2em;
-}
-
-#grass-section {
-  background: url('https://www.transparenttextures.com/patterns/green-dust.png'); /* Grass texture */
-  background-color: #4CAF50; /* Green color for grass section */
-  height: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  color: #ffffff;
-  width: 100%;
-}
-
-.plant-selection {
-  margin-top: 20px;
-}
-
-#soil-section {
-  background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png'); /* Coarse dirt texture */
-  background-color: #795548; /* Brown color for soil section */
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  width: 100%;
-}
-
-.chart-container {
-  width: 90%;
-  max-width: 800px;
-  margin-top: 20px;
-  background-color: #5d4037; /* Soil color for chart background */
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-}
-
-h2 {
-  text-align: center;
-  color: #ffffff;
-}
-
-canvas {
-  background-color: #5d4037; /* Soil color for chart background */
-  border-radius: 8px;
-  max-height: 400px; /* Limit the height of the canvas to prevent sliding */
+    font-family: Arial, sans-serif;
+    background-color: #2c3e50;
+    text-align: center;
+    color: #ecf0f1;
 }
 
 h1 {
-  margin: 0;
-  font-size: 2.5em;
+    margin-top: 20px;
+}
+
+#game {
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.cell {
+    width: 30px;
+    height: 30px;
+    background-color: #34495e;
+    border: 1px solid #2c3e50;
+    display: inline-block;
+    line-height: 30px;
+    vertical-align: top;
+    font-size: 18px;
+    color: #ecf0f1;
+    cursor: pointer;
+    user-select: none;
+}
+
+.cell.flag {
+    background-color: #e67e22;
+}
+
+.cell.revealed {
+    background-color: #95a5a6;
+    cursor: default;
+}
+
+.cell.mine {
+    background-color: #e74c3c;
+    color: #c0392b;
+}
+
+#message {
+    margin-top: 20px;
+    font-size: 18px;
 }
