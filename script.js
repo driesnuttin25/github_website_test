@@ -1,155 +1,186 @@
-// Your web app's Firebase configuration
-var firebaseConfig = {
-  apiKey: "AIzaSyCWSBStmBWQA8IzZtEyxeb2tco0xXVhpsg",
-  authDomain: "project-katara.firebaseapp.com",
-  projectId: "project-katara",
-  storageBucket: "project-katara.appspot.com",
-  messagingSenderId: "7288655338",
-  appId: "1:7288655338:web:06b74e8aa116e677a07693"
-};
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-var db = firebase.firestore();
+// Game settings
+const rows = 10;
+const cols = 10;
+const minesCount = 15;
+let grid = [];
+let gameOver = false;
 
-document.addEventListener("DOMContentLoaded", function() {
-  var moistureCtx = document.getElementById('moistureChart').getContext('2d');
-  var temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
-  var conductivityCtx = document.getElementById('conductivityChart').getContext('2d');
+// Initialize the game
+function init() {
+    grid = [];
+    gameOver = false;
+    document.getElementById('message').textContent = '';
+    const gameContainer = document.getElementById('game');
+    gameContainer.innerHTML = '';
 
-  var chartConfig = {
-    type: 'line',
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: {
-          type: 'time',
-          time: {
-            unit: 'minute',
-            stepSize: 5,
-            displayFormats: {
-              minute: 'HH:mm'
+    // Create grid cells
+    for (let r = 0; r < rows; r++) {
+        grid[r] = [];
+        for (let c = 0; c < cols; c++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+
+            // Event listeners for left and right clicks
+            cell.addEventListener('click', revealCell);
+            cell.addEventListener('contextmenu', placeFlag);
+
+            gameContainer.appendChild(cell);
+
+            grid[r][c] = {
+                element: cell,
+                mine: false,
+                revealed: false,
+                flagged: false,
+                adjacentMines: 0,
+            };
+        }
+    }
+
+    // Randomly place mines
+    let minesPlaced = 0;
+    while (minesPlaced < minesCount) {
+        const r = Math.floor(Math.random() * rows);
+        const c = Math.floor(Math.random() * cols);
+        if (!grid[r][c].mine) {
+            grid[r][c].mine = true;
+            minesPlaced++;
+        }
+    }
+
+    // Calculate adjacent mines for each cell
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (!grid[r][c].mine) {
+                let count = 0;
+                for (let i = -1; i <= 1; i++) {
+                    for (let j = -1; j <= 1; j++) {
+                        const nr = r + i;
+                        const nc = c + j;
+                        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc].mine) {
+                            count++;
+                        }
+                    }
+                }
+                grid[r][c].adjacentMines = count;
             }
-          },
-          title: {
-            display: true,
-            text: 'Time'
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Value'
-          },
-          suggestedMin: 0,
-          suggestedMax: 100
         }
-      }
     }
-  };
+}
 
-  var moistureChart = new Chart(moistureCtx, {
-    ...chartConfig,
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Moisture',
-        data: [],
-        backgroundColor: 'rgba(0, 150, 136, 0.2)',
-        borderColor: 'rgba(0, 150, 136, 1)',
-        borderWidth: 2,
-        fill: true
-      }]
-    }
-  });
+// Reveal a cell
+function revealCell(e) {
+    if (gameOver) return;
+    const cell = e.target;
+    const r = parseInt(cell.dataset.row);
+    const c = parseInt(cell.dataset.col);
+    const currentCell = grid[r][c];
 
-  var temperatureChart = new Chart(temperatureCtx, {
-    ...chartConfig,
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Temperature',
-        data: [],
-        backgroundColor: 'rgba(0, 100, 50, 0.2)',
-        borderColor: 'rgba(0, 100, 50, 1)',
-        borderWidth: 2,
-        fill: true
-      }]
-    }
-  });
+    if (currentCell.revealed || currentCell.flagged) return;
 
-  var conductivityChart = new Chart(conductivityCtx, {
-    ...chartConfig,
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Conductivity',
-        data: [],
-        backgroundColor: 'rgba(0, 50, 25, 0.2)',
-        borderColor: 'rgba(0, 50, 25, 1)',
-        borderWidth: 2,
-        fill: true
-      }]
-    }
-  });
+    currentCell.revealed = true;
+    cell.classList.add('revealed');
 
-  db.collection("sensorData").orderBy("createTime").onSnapshot((querySnapshot) => {
-    var moistureLabels = [];
-    var moistureData = [];
-    var temperatureLabels = [];
-    var temperatureData = [];
-    var conductivityLabels = [];
-    var conductivityData = [];
-    
-    querySnapshot.forEach((doc) => {
-      var createTime = doc.data().createTime;
-      if (createTime && createTime.seconds && createTime.seconds > 1000000000) { // Ignore timestamps before ~2001
-        var timestamp = createTime.seconds * 1000;
-        var moisture = doc.data().moisture;
-        var temperature = doc.data().temperature;
-        var conductivity = doc.data().conductivity;
-        
-        if (moisture != null) {
-          moistureLabels.push(new Date(timestamp));
-          moistureData.push(moisture);
+    if (currentCell.mine) {
+        cell.classList.add('mine');
+        cell.textContent = '💣';
+        gameOver = true;
+        document.getElementById('message').textContent = 'Game Over! Press Spacebar to Restart.';
+        revealAllMines();
+    } else {
+        if (currentCell.adjacentMines > 0) {
+            cell.textContent = currentCell.adjacentMines;
+        } else {
+            // Reveal neighboring cells if no adjacent mines
+            revealAdjacentCells(r, c);
         }
-        if (temperature != null) {
-          temperatureLabels.push(new Date(timestamp));
-          temperatureData.push(temperature);
+        checkWin();
+    }
+}
+
+// Reveal adjacent cells recursively
+function revealAdjacentCells(r, c) {
+    for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+            const nr = r + i;
+            const nc = c + j;
+            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                const neighbor = grid[nr][nc];
+                if (!neighbor.revealed && !neighbor.mine && !neighbor.flagged) {
+                    neighbor.revealed = true;
+                    neighbor.element.classList.add('revealed');
+                    if (neighbor.adjacentMines > 0) {
+                        neighbor.element.textContent = neighbor.adjacentMines;
+                    } else {
+                        revealAdjacentCells(nr, nc);
+                    }
+                }
+            }
         }
-        if (conductivity != null) {
-          conductivityLabels.push(new Date(timestamp));
-          conductivityData.push(conductivity);
+    }
+}
+
+// Place or remove a flag
+function placeFlag(e) {
+    e.preventDefault();
+    if (gameOver) return;
+    const cell = e.target;
+    const r = parseInt(cell.dataset.row);
+    const c = parseInt(cell.dataset.col);
+    const currentCell = grid[r][c];
+
+    if (currentCell.revealed) return;
+
+    currentCell.flagged = !currentCell.flagged;
+    if (currentCell.flagged) {
+        cell.classList.add('flag');
+        cell.textContent = '🚩';
+    } else {
+        cell.classList.remove('flag');
+        cell.textContent = '';
+    }
+    checkWin();
+}
+
+// Check for win condition
+function checkWin() {
+    let revealedCount = 0;
+    let correctlyFlagged = 0;
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const cell = grid[r][c];
+            if (cell.revealed) revealedCount++;
+            if (cell.flagged && cell.mine) correctlyFlagged++;
         }
-      }
-    });
-
-    // Update Moisture Chart
-    if (moistureLabels.length > 0 && moistureData.length > 0) {
-      moistureChart.data.labels = moistureLabels;
-      moistureChart.data.datasets[0].data = moistureData;
-      moistureChart.update();
     }
 
-    // Update Temperature Chart
-    if (temperatureLabels.length > 0 && temperatureData.length > 0) {
-      temperatureChart.data.labels = temperatureLabels;
-      temperatureChart.data.datasets[0].data = temperatureData;
-      temperatureChart.update();
+    if (revealedCount + minesCount === rows * cols || correctlyFlagged === minesCount) {
+        gameOver = true;
+        document.getElementById('message').textContent = 'You Win! Press Spacebar to Restart.';
     }
+}
 
-    // Update Conductivity Chart
-    if (conductivityLabels.length > 0 && conductivityData.length > 0) {
-      conductivityChart.data.labels = conductivityLabels;
-      conductivityChart.data.datasets[0].data = conductivityData;
-      conductivityChart.update();
+// Reveal all mines when game over
+function revealAllMines() {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const cell = grid[r][c];
+            if (cell.mine) {
+                cell.element.classList.add('mine');
+                cell.element.textContent = '💣';
+            }
+        }
     }
-  });
+}
 
-  // Plant selection event
-  document.getElementById('plant-select').addEventListener('change', function() {
-    var selectedPlant = this.value;
-    console.log("Selected plant:", selectedPlant);
-    // Add any additional functionality for selected plant here
-  });
+// Restart the game on spacebar press
+document.body.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+        init();
+    }
 });
+
+// Initialize the game on window load
+window.onload = init;
