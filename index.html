@@ -1,16 +1,460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Minesweeper Game</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Plant Monitor Dashboard</title>
+  
+  <!-- Dark Green Theme -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #0D2B0F; /* Very dark green background */
+      color: #E5FCE7;           /* Light greenish text */
+    }
+
+    header {
+      text-align: center;
+      margin: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    /* Main container as a two-column layout */
+    .container {
+      display: flex;
+      flex-wrap: wrap; 
+      margin: 20px;
+    }
+
+    /* Left column for settings + current data */
+    .left-col {
+      flex: 0 0 300px; /* fixed width for narrower screens, adjust as needed */
+      max-width: 400px;
+      margin-right: 20px;
+    }
+
+    /* Right column for stacked graphs */
+    .right-col {
+      flex: 1; /* fill remaining space */
+      min-width: 0;
+    }
+
+    .panel {
+      background-color: #173C18;  /* Slightly lighter green for containers */
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: inline-block;
+      width: 150px;
+    }
+
+    input[type="number"], select {
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid #555;
+      background-color: #0D2B0F;
+      color: #E5FCE7;
+    }
+
+    button {
+      background-color: #2E7D32;
+      color: #E5FCE7;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #388E3C;
+    }
+
+    /* Panel for the graphs */
+    .graphs canvas {
+      background-color: #fff; /* white background for the charts */
+      border-radius: 8px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 600px; /* set a max width so they don't blow out the layout */
+    }
+
+    /* Basic responsiveness for the forms */
+    @media (max-width: 768px) {
+      label {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      .container {
+        flex-direction: column;
+      }
+      .left-col, .right-col {
+        max-width: 100%;
+        margin-right: 0;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Minesweeper</h1>
-    <div id="game"></div>
-    <div id="message"></div> <!-- Added this line -->
-    <script src="script.js"></script>
+  
+  <header>
+    <h1>Plant Monitor Dashboard</h1>
+    <p>Device ID: <strong>test_plant</strong></p>
+  </header>
+
+  <div class="container">
+    <!-- Left Column: Settings + Current Data -->
+    <div class="left-col">
+      
+      <!-- Settings Panel -->
+      <div class="panel">
+        <h2>Device Settings</h2>
+        <div class="form-group">
+          <label for="desiredMoistureInput">Desired Moisture</label>
+          <input type="number" id="desiredMoistureInput" placeholder="e.g. 1500" />
+        </div>
+
+        <div class="form-group">
+          <label for="ledModeSelect">LED Mode</label>
+          <select id="ledModeSelect">
+            <option value="off">Off</option>
+            <option value="on">On</option>
+            <option value="auto">Auto (12h on/off)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="activeSelect">Active</label>
+          <select id="activeSelect">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <button id="updateSettingsBtn">Update Settings</button>
+      </div>
+
+      <!-- Current Data Panel -->
+      <div class="panel">
+        <h2>Current Data</h2>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li>Moisture: <span id="currentMoisture">-</span></li>
+          <li>Temperature: <span id="currentTemperature">-</span> °C</li>
+          <li>Conductivity: <span id="currentConductivity">-</span></li>
+        </ul>
+      </div>
+
+    </div> <!-- end left-col -->
+
+    <!-- Right Column: Graphs -->
+    <div class="right-col">
+      <div class="panel graphs">
+        <h2>Sensor Data (Last 12 Hours)</h2>
+        <canvas id="moistureChart" width="400" height="200"></canvas>
+        <canvas id="temperatureChart" width="400" height="200"></canvas>
+        <canvas id="conductivityChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Chart.js (latest) from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase App (core SDK) -->
+  <script type="module">
+    // NOTE: This is an example using the Firebase v9 (Modular) SDK
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { 
+      getFirestore, 
+      doc, getDoc, updateDoc,
+      collection, query, where, orderBy, onSnapshot
+    } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    /**************************************************
+     * 1) Firebase Config
+     **************************************************/
+    // REPLACE these with your actual config values.
+    const firebaseConfig = {
+    apiKey: "AIzaSyCWSBStmBWQA8IzZtEyxeb2tco0xXVhpsg",
+    authDomain: "project-katara.firebaseapp.com",
+    databaseURL: "https://project-katara-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "project-katara",
+    storageBucket: "project-katara.firebasestorage.app",
+    messagingSenderId: "7288655338",
+    appId: "1:7288655338:web:06b74e8aa116e677a07693",
+    measurementId: "G-J465YLGVQ9"
+    };
+
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // The "planters/test_plant" document
+    const planterDocRef = doc(db, "planters", "test_plant");
+    // The sub-collection for measurements
+    // Each doc in "measurements" should have fields: { moisture, temperature, conductivity, timestamp }
+    const measurementsColRef = collection(db, "planters", "test_plant", "measurements");
+
+    /**************************************************
+     * 2) HTML Elements
+     **************************************************/
+    const desiredMoistureInput = document.getElementById('desiredMoistureInput');
+    const ledModeSelect        = document.getElementById('ledModeSelect');
+    const activeSelect         = document.getElementById('activeSelect');
+    const updateSettingsBtn    = document.getElementById('updateSettingsBtn');
+
+    // Chart elements
+    const moistureCanvas       = document.getElementById('moistureChart');
+    const temperatureCanvas    = document.getElementById('temperatureChart');
+    const conductivityCanvas   = document.getElementById('conductivityChart');
+
+    // Current data fields
+    const currentMoistureEl    = document.getElementById('currentMoisture');
+    const currentTempEl        = document.getElementById('currentTemperature');
+    const currentCondEl        = document.getElementById('currentConductivity');
+
+    /**************************************************
+     * 3) Chart.js Setup
+     **************************************************/
+    let moistureChart, temperatureChart, conductivityChart;
+    
+    // Helper function: create a Chart.js line chart
+    function createLineChart(canvasElem, label, color) {
+      return new Chart(canvasElem, {
+        type: 'line',
+        data: {
+          labels: [], // time array
+          datasets: [{
+            label: label,
+            data: [], // data array
+            borderColor: color,
+            backgroundColor: 'rgba(0,0,0,0)',
+            tension: 0.1
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'hour',
+                displayFormats: {
+                  hour: 'HH:mm'
+                }
+              },
+              ticks: {
+                color: '#E5FCE7'
+              }
+            },
+            y: {
+              beginAtZero: false,
+              ticks: {
+                color: '#E5FCE7'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: '#E5FCE7'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize the charts
+    moistureChart     = createLineChart(moistureCanvas, "Moisture", "lime");
+    temperatureChart  = createLineChart(temperatureCanvas, "Temperature (°C)", "orange");
+    conductivityChart = createLineChart(conductivityCanvas, "Conductivity", "cyan");
+
+    /**************************************************
+     * 4) Load Current Settings from Firestore
+     **************************************************/
+    async function loadCurrentSettings() {
+      try {
+        const snap = await getDoc(planterDocRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          // Example structure: 
+          // data.desiredMoisture = { integerValue: 1500 }
+          // data.ledMode = { stringValue: "off" }
+          // data.active = { stringValue: "active" }
+          
+          if (data.desiredMoisture?.integerValue !== undefined) {
+            desiredMoistureInput.value = data.desiredMoisture.integerValue;
+          } else if (data.desiredMoisture?.doubleValue !== undefined) {
+            desiredMoistureInput.value = data.desiredMoisture.doubleValue;
+          }
+
+          if (data.ledMode?.stringValue) {
+            ledModeSelect.value = data.ledMode.stringValue;
+          }
+          if (data.active?.stringValue) {
+            activeSelect.value = data.active.stringValue;
+          }
+        } else {
+          console.log("Document doesn't exist; using defaults.");
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+      }
+    }
+
+    /**************************************************
+     * 5) Update Settings in Firestore
+     **************************************************/
+    async function updateSettings() {
+      try {
+        const moistureVal = parseInt(desiredMoistureInput.value) || 1500;
+        const ledVal      = ledModeSelect.value || "off";
+        const activeVal   = activeSelect.value  || "active";
+
+        // We'll do a partial update (similar to the ESP32's structure)
+        // e.g. { desiredMoisture: { integerValue: 1500 }, ledMode: { stringValue: "on" }, active: { stringValue: "active" } }
+        const payload = {
+          desiredMoisture: { integerValue: moistureVal },
+          ledMode:         { stringValue:  ledVal },
+          active:          { stringValue:  activeVal }
+        };
+
+        await updateDoc(planterDocRef, payload);
+        alert("Settings updated!");
+      } catch (err) {
+        console.error("Failed to update settings:", err);
+        alert("Failed to update settings.");
+      }
+    }
+
+    /**************************************************
+     * 6) Listen for Measurements (Last 12 Hours)
+     **************************************************/
+    async function listenForMeasurements() {
+      const TWELVE_HOURS_IN_MS = 12 * 60 * 60 * 1000;
+      const now = Date.now();
+      const twelveHoursAgo = new Date(now - TWELVE_HOURS_IN_MS);
+
+      // Firestore query:
+      const q = query(
+        measurementsColRef, 
+        where("timestamp", ">", twelveHoursAgo),
+        orderBy("timestamp", "asc")
+      );
+
+      onSnapshot(q, (snapshot) => {
+        // If no data, show some placeholders in the charts
+        if (snapshot.empty) {
+          console.log("No measurement data in the last 12 hours. Showing placeholders.");
+
+          // Clear existing data
+          moistureChart.data.labels = [];
+          moistureChart.data.datasets[0].data = [];
+          temperatureChart.data.labels = [];
+          temperatureChart.data.datasets[0].data = [];
+          conductivityChart.data.labels = [];
+          conductivityChart.data.datasets[0].data = [];
+
+          // Just push 5 placeholder points for demonstration
+          const now = new Date();
+          for (let i = 0; i < 5; i++) {
+            let time = new Date(now.getTime() - i * 60000); // 1-minute intervals
+            moistureChart.data.labels.unshift(time);
+            moistureChart.data.datasets[0].data.unshift(0);
+
+            temperatureChart.data.labels.unshift(time);
+            temperatureChart.data.datasets[0].data.unshift(0);
+
+            conductivityChart.data.labels.unshift(time);
+            conductivityChart.data.datasets[0].data.unshift(0);
+          }
+
+          moistureChart.update();
+          temperatureChart.update();
+          conductivityChart.update();
+
+          // Also clear current data
+          currentMoistureEl.textContent = "-";
+          currentTempEl.textContent     = "-";
+          currentCondEl.textContent     = "-";
+          return;
+        }
+
+        // Clear existing data arrays
+        moistureChart.data.labels = [];
+        moistureChart.data.datasets[0].data = [];
+
+        temperatureChart.data.labels = [];
+        temperatureChart.data.datasets[0].data = [];
+
+        conductivityChart.data.labels = [];
+        conductivityChart.data.datasets[0].data = [];
+
+        let latestDoc = null;
+
+        snapshot.forEach(docSnap => {
+          const mData = docSnap.data();
+          // e.g. mData = { moisture, temperature, conductivity, timestamp: <Firestore Timestamp> }
+          // Convert Firestore Timestamp to JS Date
+          const time = mData.timestamp?.toDate ? mData.timestamp.toDate() : new Date();
+
+          // Push data for charts
+          moistureChart.data.labels.push(time);
+          moistureChart.data.datasets[0].data.push(mData.moisture || 0);
+
+          temperatureChart.data.labels.push(time);
+          temperatureChart.data.datasets[0].data.push(mData.temperature || 0);
+
+          conductivityChart.data.labels.push(time);
+          conductivityChart.data.datasets[0].data.push(mData.conductivity || 0);
+
+          // Keep track of the last doc as "latest"
+          latestDoc = mData;
+        });
+
+        // Update all charts
+        moistureChart.update();
+        temperatureChart.update();
+        conductivityChart.update();
+
+        // Update "current data" with the last doc
+        if (latestDoc) {
+          currentMoistureEl.textContent = latestDoc.moisture ?? "-";
+          currentTempEl.textContent     = latestDoc.temperature ?? "-";
+          currentCondEl.textContent     = latestDoc.conductivity ?? "-";
+        }
+      }, (error) => {
+        console.error("Snapshot listener error:", error);
+      });
+    }
+
+    /**************************************************
+     * 7) Event Listeners
+     **************************************************/
+    updateSettingsBtn.addEventListener('click', updateSettings);
+
+    /**************************************************
+     * 8) On Page Load
+     **************************************************/
+    loadCurrentSettings();     // get device config from Firestore
+    listenForMeasurements();   // start real-time listener for the last 12h of data
+  </script>
 </body>
 </html>
-
-
