@@ -440,25 +440,9 @@
 
       let content = '';
       if (!remaining && state.mode === 'training') {
-        content = `<div class="text-center py-10">
-          <p class="text-5xl mb-3">🎉</p>
-          <p class="text-lg font-semibold mb-1">Training complete</p>
-          <p class="text-sm text-zinc-500 mb-6">You marked all cards as known.</p>
-          <div class="flex items-center justify-center gap-2">
-            <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="location.hash = '#/chapter/${course.id}/${chapter.id}'">Back to chapter</button>
-            <button class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700" onclick="quiz.reset()">Reset</button>
-          </div>
-        </div>`;
+        content = `<div class=\"text-center py-10\">\n          <p class=\"text-5xl mb-3\">🎉</p>\n          <p class=\"text-lg font-semibold mb-1\">Training complete</p>\n          <p class=\"text-sm text-zinc-500 mb-6\">You marked all cards as known.</p>\n          <div class=\"flex items-center justify-center gap-2\">\n            <button class=\"px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700\" onclick=\"location.hash = '#/chapter/${course.id}/${chapter.id}'\">Back to chapter</button>\n            <button class=\"px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700\" onclick=\"quiz.reset()\">Reset</button>\n          </div>\n        </div>`;
       } else if (state.mode === 'order' && state.current >= state.queue.length) {
-        content = `<div class="text-center py-10">
-          <p class="text-5xl mb-3">✅</p>
-          <p class="text-lg font-semibold mb-1">End of deck</p>
-          <p class="text-sm text-zinc-500 mb-4">Score: <b>${state.correct}</b> known, <b>${state.wrong}</b> unknown</p>
-          <div class="flex items-center justify-center gap-2">
-            <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="quiz.reset()">Restart</button>
-            <button class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700" onclick="location.hash = '#/chapter/${course.id}/${chapter.id}'">Back</button>
-          </div>
-        </div>`;
+        content = `<div class=\"text-center py-10\">\n          <p class=\"text-5xl mb-3\">✅</p>\n          <p class=\"text-lg font-semibold mb-1\">End of deck</p>\n          <p class=\"text-sm text-zinc-500 mb-4\">Score: <b>${state.correct}</b> known, <b>${state.wrong}</b> unknown</p>\n          <div class=\"flex items-center justify-center gap-2\">\n            <button class=\"px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700\" onclick=\"quiz.reset()\">Restart</button>\n            <button class=\"px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700\" onclick=\"location.hash = '#/chapter/${course.id}/${chapter.id}'\">Back</button>\n          </div>\n        </div>`;
       } else {
         const card = state.queue[state.current];
         const q = card?.it?.q || '(No question)';
@@ -511,7 +495,6 @@
             <div>Hotkeys: ← / → to mark • Space to reveal • H = Home • T = Theme</div>
             <div class="flex items-center gap-2">
               <button id="btnReset" class="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700">Reset</button>
-              <button class="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700" onclick="location.hash = '#/chapter/${course.id}/${chapter.id}'">Exit</button>
             </div>
           </div>
         </div>`;
@@ -530,6 +513,14 @@
       $('#btnNo')?.addEventListener('click', () => quiz.mark(false));
       $('#btnYes')?.addEventListener('click', () => quiz.mark(true));
       $('#btnReset')?.addEventListener('click', () => quiz.reset());
+
+      // Make clicking on the ANSWER toggle reveal on both touch and mouse, without triggering drag
+      const ans = $('#answer');
+      if (ans) {
+        ans.addEventListener('click', (e) => { e.stopPropagation(); quiz.reveal(); });
+        ans.addEventListener('mousedown', (e) => e.stopPropagation());
+        ans.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+      }
 
       // Swipe handling with live preview
       if (cardEl) initSwipePreview(cardEl, {
