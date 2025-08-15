@@ -1,6 +1,7 @@
 {
   "courses": [
     {
+      "id": "comp-arch",
       "name": "Computer Architectures",
       "chapters": [
         {
