@@ -5,6 +5,7 @@
       "name": "Computer Architectures",
       "chapters": [
         {
+          "id": "arithmetic",
           "name": "Arithmetic",
           "items": [
             { "q": "What does the ALU do, and what data types can it handle?", "a": "Executes arithmetic/logic; always integers, and floating-point via an on-chip FPU or separate coprocessor." },
