@@ -11,9 +11,28 @@
     tailwind.config = { darkMode: 'class' }
   </script>
   <style>
-    /* Basic swipe visual feedback */
-    .swipe-left { transform: translateX(-120%); opacity: 0; transition: transform 200ms ease, opacity 200ms ease; }
-    .swipe-right { transform: translateX(120%); opacity: 0; transition: transform 200ms ease, opacity 200ms ease; }
+    /* Swipe feedback + animation */
+    .swipe-left  { transform: translateX(-120%) rotate(-6deg); opacity: 0; transition: transform 220ms ease, opacity 220ms ease; }
+    .swipe-right { transform: translateX(120%)  rotate( 6deg); opacity: 0; transition: transform 220ms ease, opacity 220ms ease; }
+
+    .progress-fill { transition: width 400ms ease; }
+
+    /* Drag preview helpers */
+    .dragging { transition: none !important; }
+    .badge {
+      position: absolute;
+      top: 12px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 120ms ease, transform 120ms ease;
+      user-select: none;
+    }
+    .badge-left  { left: 12px;  background: rgba(244,63,94,0.15);  color: rgb(244,63,94);  border: 1px solid rgba(244,63,94,0.35); }
+    .badge-right { right: 12px; background: rgba(34,197,94,0.15); color: rgb(34,197,94); border: 1px solid rgba(34,197,94,0.35); }
   </style>
 </head>
 <body class="h-full bg-zinc-50 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50">
@@ -269,6 +288,7 @@
       if (shuffle) shuffleArray(items);
 
       quiz = createQuizSession({ course, chapter, items, mode, persist });
+      window.quiz = quiz; // expose so inline handlers always work
       renderQuiz();
     }
 
@@ -279,28 +299,40 @@
       // Build initial queue
       let queue = items.map((it, idx) => ({ idx, it }));
 
-      let known = new Set();
+      // Known across sessions (optional)
+      let knownPersisted = new Set();
       if (mode === 'training' && persist) {
         const savedKnown = JSON.parse(localStorage.getItem(STORAGE_KEYS.known(chapter.id)) || '[]');
-        known = new Set(savedKnown);
-        if (known.size) {
-          queue = queue.filter(q => !known.has(q.idx));
+        knownPersisted = new Set(savedKnown);
+        if (knownPersisted.size) {
+          queue = queue.filter(q => !knownPersisted.has(q.idx));
         }
       }
 
+      // Session state
       let state = saved && saved.itemsHash === hashItems(items) ? saved.state : {
         mode,
         courseId: course.id,
         chapterId: chapter.id,
         current: 0,
+        // Unique counters via sets (prevent double-count)
         correct: 0,
         wrong: 0,
+        knownOnce: [],         // array for persistence
+        unknownOnce: [],
         queue,
-        known: Array.from(known),
+        known: Array.from(knownPersisted), // persisted across sessions (training)
         reveal: false,
       };
 
+      // Rebuild sets from arrays
+      let knownOnceSet = new Set(state.knownOnce || []);
+      let unknownOnceSet = new Set(state.unknownOnce || []);
+
       function persistState() {
+        // store arrays (not sets)
+        state.knownOnce = Array.from(knownOnceSet);
+        state.unknownOnce = Array.from(unknownOnceSet);
         localStorage.setItem(key, JSON.stringify({ itemsHash: hashItems(items), state }));
         if (mode === 'training' && persist) {
           localStorage.setItem(STORAGE_KEYS.known(chapter.id), JSON.stringify(state.known));
@@ -308,6 +340,14 @@
       }
 
       function reset() {
+        knownOnceSet.clear();
+        unknownOnceSet.clear();
+        // Clear persisted state for this mode
+        localStorage.removeItem(key);
+        // Also clear persisted-known if we are in training (fresh start)
+        if (mode === 'training') {
+          localStorage.removeItem(STORAGE_KEYS.known(chapter.id));
+        }
         state = {
           mode,
           courseId: course.id,
@@ -315,8 +355,10 @@
           current: 0,
           correct: 0,
           wrong: 0,
+          knownOnce: [],
+          unknownOnce: [],
           queue: items.map((it, idx) => ({ idx, it })),
-          known: mode === 'training' && persist ? state.known : [],
+          known: [],
           reveal: false,
         };
         persistState();
@@ -328,55 +370,73 @@
         const pos = state.current;
         const card = state.queue[pos];
 
-        // Increment scores
-        if (knownFlag) state.correct++; else state.wrong++;
+        // Unique counting logic
+        if (knownFlag) {
+          if (!knownOnceSet.has(card.idx)) {
+            knownOnceSet.add(card.idx);
+            state.correct = knownOnceSet.size;
+          }
+          // If it was previously unknown, move it out of unknown set
+          if (unknownOnceSet.delete(card.idx)) {
+            state.wrong = unknownOnceSet.size;
+          }
 
-        if (state.mode === 'order') {
-          // Just move to next; do not re-insert unknowns
-          state.current++;
-        } else {
-          // TRAINING: known → remove all occurrences; unknown → reinsert after 4
-          if (knownFlag) {
-            // Mark as known and purge from queue
+          // TRAINING: mark as known and purge future occurrences
+          if (state.mode === 'training') {
             if (!state.known.includes(card.idx)) state.known.push(card.idx);
-            // Remove all occurrences of this idx in queue
+            // Remove current + any future duplicates of this idx
             state.queue = state.queue.filter((c, i) => !(c.idx === card.idx && i >= pos));
-            // current stays the same (now points at next card)
+            // current stays at same index to show next card
           } else {
-            // Reinsert a copy after 4 positions from current
+            state.current++;
+          }
+        } else {
+          // Mark as unknown only once per unique card
+          if (!unknownOnceSet.has(card.idx)) {
+            unknownOnceSet.add(card.idx);
+            state.wrong = unknownOnceSet.size;
+          }
+          // TRAINING: reinsert after 4; ORDER: just advance
+          if (state.mode === 'training') {
             const reinsertionOffset = 4;
             const insertPos = Math.min(pos + reinsertionOffset + 1, state.queue.length);
             state.queue.splice(insertPos, 0, { idx: card.idx, it: card.it });
+            state.current++;
+          } else {
             state.current++;
           }
         }
 
         state.reveal = false;
 
-        // If we reached end, stop at last index (for order) or finish when queue empty
-        if (state.current >= state.queue.length) state.current = state.queue.length; // indicates done
+        // Bounds check
+        if (state.current >= state.queue.length) state.current = state.queue.length;
+
         persistState();
         renderQuiz(knownFlag ? (viaSwipe ? 'right' : null) : (viaSwipe ? 'left' : null));
       }
 
       function reveal() { state.reveal = !state.reveal; persistState(); renderQuiz(); }
 
-      function isDone() {
-        if (state.mode === 'order') return state.current >= state.queue.length;
-        return state.queue.length === 0; // training: empty queue means done
+      function uniqueSeenCount() {
+        // union size of knownOnce and unknownOnce
+        return new Set([...knownOnceSet, ...unknownOnceSet]).size;
       }
 
-      return { state, reveal, reset, mark, persistState };
+      return { state, reveal, reset, mark, persistState, uniqueSeenCount,
+               _sets: { knownOnceSet, unknownOnceSet } };
     }
 
     function renderQuiz(swipedDirection = null) {
-      const { state } = quiz;
+      const { state, uniqueSeenCount } = quiz;
       const course = getCourseById(state.courseId);
       const chapter = getChapterById(course, state.chapterId);
 
       const total = (chapter.items || []).length;
-      const done = state.mode === 'order' ? Math.min(state.current, state.queue.length) : (total - state.queue.length - state.known.length);
-      const remaining = state.mode === 'order' ? (state.queue.length - state.current) : state.queue.length;
+      const seen = uniqueSeenCount();
+      const remaining = state.mode === 'order'
+        ? (state.queue.length - state.current)
+        : state.queue.length;
 
       let content = '';
       if (!remaining && state.mode === 'training') {
@@ -420,10 +480,12 @@
           </div>
 
           <div class="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-            <div class="h-full bg-indigo-600" style="width: ${(total ? (done/total*100) : 0).toFixed(1)}%"></div>
+            <div class="h-full bg-indigo-600 progress-fill" style="width: ${(total ? (seen/total*100) : 0).toFixed(1)}%"></div>
           </div>
 
-          <div id="card" class="relative rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow p-4 md:p-6 select-none">
+          <div id="card" class="relative rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow p-4 md:p-6 select-none will-change-transform">
+            <div class="badge badge-left">Don’t know</div>
+            <div class="badge badge-right">I know</div>
             ${img ? `<img src="${escapeAttr(img)}" alt="" class="w-full max-h-56 object-contain rounded-xl mb-3">` : ''}
             <div class="mb-2 text-sm uppercase tracking-wide text-zinc-500">Question</div>
             <div class="text-lg md:text-xl font-medium whitespace-pre-wrap">${escapeHtml(q)}</div>
@@ -448,7 +510,7 @@
           <div class="flex items-center justify-between text-xs text-zinc-500">
             <div>Hotkeys: ← / → to mark • Space to reveal • H = Home • T = Theme</div>
             <div class="flex items-center gap-2">
-              <button class="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700" onclick="quiz.reset()">Reset</button>
+              <button id="btnReset" class="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700">Reset</button>
               <button class="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700" onclick="location.hash = '#/chapter/${course.id}/${chapter.id}'">Exit</button>
             </div>
           </div>
@@ -461,15 +523,16 @@
       const cardEl = $('#card');
       if (cardEl && swipedDirection) {
         cardEl.classList.add(swipedDirection === 'left' ? 'swipe-left' : 'swipe-right');
-        setTimeout(() => { cardEl?.classList.remove('swipe-left','swipe-right'); }, 220);
+        setTimeout(() => { cardEl?.classList.remove('swipe-left','swipe-right'); }, 230);
       }
 
       $('#revealBtn')?.addEventListener('click', () => quiz.reveal());
       $('#btnNo')?.addEventListener('click', () => quiz.mark(false));
       $('#btnYes')?.addEventListener('click', () => quiz.mark(true));
+      $('#btnReset')?.addEventListener('click', () => quiz.reset());
 
-      // Swipe handling
-      if (cardEl) initSwipe(cardEl, {
+      // Swipe handling with live preview
+      if (cardEl) initSwipePreview(cardEl, {
         onLeft: () => quiz.mark(false, true),
         onRight: () => quiz.mark(true, true)
       });
@@ -493,8 +556,8 @@
     }
 
     /*************************
-     * Events & Init
-     *************************/
+    * Events & Init
+    *************************/
     $('#homeBtn').addEventListener('click', () => location.hash = '#/');
     $('#darkToggle').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
 
@@ -504,25 +567,87 @@
       if (e.key === 't' || e.key === 'T') { setTheme(!document.documentElement.classList.contains('dark')); }
       if (!quiz) return;
       if (e.code === 'Space') { e.preventDefault(); quiz.reveal(); }
-      if (e.key === 'ArrowLeft') { e.preventDefault(); quiz.mark(false); }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); quiz.mark(false); }
       if (e.key === 'ArrowRight') { e.preventDefault(); quiz.mark(true); }
     });
 
-    // Swipe util
-    function initSwipe(el, { onLeft, onRight }) {
+    // Swipe with live drag preview
+    function initSwipePreview(el, { onLeft, onRight }) {
       let startX = 0, startY = 0, dragging = false;
+      let lastDX = 0;
+      const badgeL = el.querySelector('.badge-left');
+      const badgeR = el.querySelector('.badge-right');
+
+      const commitThreshold = Math.max(60, window.innerWidth * 0.18); // ~18% of width
+
+      function setPreview(dx, dy) {
+        const damp = Math.min(1, Math.abs(dx) / commitThreshold);
+        const rot = (dx / 20); // small rotation
+        el.style.transform = `translateX(${dx}px) rotate(${rot}deg)`;
+        el.classList.add('dragging');
+
+        if (badgeL && badgeR) {
+          if (dx < 0) {
+            badgeL.style.opacity = Math.min(1, damp * 1.2);
+            badgeL.style.transform = `scale(${0.95 + 0.05*damp})`;
+            badgeR.style.opacity = 0; badgeR.style.transform = 'scale(0.95)';
+          } else if (dx > 0) {
+            badgeR.style.opacity = Math.min(1, damp * 1.2);
+            badgeR.style.transform = `scale(${0.95 + 0.05*damp})`;
+            badgeL.style.opacity = 0; badgeL.style.transform = 'scale(0.95)';
+          } else {
+            badgeL.style.opacity = 0; badgeR.style.opacity = 0;
+          }
+        }
+      }
+
+      function resetPreview() {
+        el.classList.remove('dragging');
+        el.style.transition = 'transform 160ms ease';
+        el.style.transform = '';
+        setTimeout(() => { el.style.transition = ''; }, 170);
+        if (badgeL && badgeR) { badgeL.style.opacity = 0; badgeR.style.opacity = 0; }
+      }
+
       el.addEventListener('touchstart', (e) => {
-        const t = e.touches[0]; startX = t.clientX; startY = t.clientY; dragging = true;
-      });
+        const t = e.touches[0]; startX = t.clientX; startY = t.clientY; dragging = true; lastDX = 0;
+      }, { passive: true });
+
       el.addEventListener('touchmove', (e) => {
-        if (!dragging) return; // optional visual drag could be added here
-      });
-      el.addEventListener('touchend', (e) => {
-        if (!dragging) return; dragging = false;
-        const t = e.changedTouches[0];
+        if (!dragging) return;
+        const t = e.touches[0];
         const dx = t.clientX - startX; const dy = t.clientY - startY;
-        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+        // Ignore mostly vertical drags
+        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dx) < 10) return;
+        lastDX = dx;
+        setPreview(dx, dy);
+      }, { passive: true });
+
+      el.addEventListener('touchend', () => {
+        if (!dragging) return; dragging = false;
+        const dx = lastDX;
+        if (Math.abs(dx) > commitThreshold) {
           if (dx < 0) onLeft && onLeft(); else onRight && onRight();
+        } else {
+          resetPreview();
+        }
+      });
+
+      // Optional mouse support for desktop
+      let mouseDown = false;
+      el.addEventListener('mousedown', (e) => { mouseDown = true; startX = e.clientX; startY = e.clientY; });
+      document.addEventListener('mousemove', (e) => {
+        if (!mouseDown) return;
+        const dx = e.clientX - startX; const dy = e.clientY - startY;
+        lastDX = dx; setPreview(dx, dy);
+      });
+      document.addEventListener('mouseup', () => {
+        if (!mouseDown) return; mouseDown = false;
+        const dx = lastDX;
+        if (Math.abs(dx) > commitThreshold) {
+          if (dx < 0) onLeft && onLeft(); else onRight && onRight();
+        } else {
+          resetPreview();
         }
       });
     }
