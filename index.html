@@ -1,35 +1,547 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cute Prank Site</title>
-
-  <!-- External CSS & JS -->
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Study Trainer</title>
+  <!-- Tailwind via CDN (fine for GitHub Pages) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind config for dark mode
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <style>
+    /* Basic swipe visual feedback */
+    .swipe-left { transform: translateX(-120%); opacity: 0; transition: transform 200ms ease, opacity 200ms ease; }
+    .swipe-right { transform: translateX(120%); opacity: 0; transition: transform 200ms ease, opacity 200ms ease; }
+  </style>
 </head>
+<body class="h-full bg-zinc-50 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50">
+  <!--
+  ===============================================================
+  Flashcard Trainer – Single-file app for GitHub Pages
+  ---------------------------------------------------------------
+  HOW TO USE
+  1) Put this file as index.html at the root of your GitHub Pages repo.
+  2) Create a file named `chapters.json` (same folder) that matches the schema below.
+  3) Commit & push. The app auto-loads your JSON. If not found, it falls back to SAMPLE_CHAPTERS.
 
-<body>
-  <!-- Big headline -->
-  <h1>IS MUSS STUPID?</h1>
+  JSON SCHEMA (copy to chapters.json and fill in your own content):
+  {
+    "courses": [
+      {
+        "id": "comp-arch",
+        "name": "Computer Architecture",
+        "chapters": [
+          {
+            "id": "internal-memory",
+            "name": "Internal Memory",
+            "items": [
+              {"q": "Question text...", "a": "Answer text...", "img": "optional/path/to/image.png"}
+            ]
+          },
+          {
+            "id": "flash-ddr",
+            "name": "Flash & DDR",
+            "items": []
+          },
+          {
+            "id": "ssds",
+            "name": "How SSDs really work",
+            "items": []
+          }
+        ]
+      }
+    ]
+  }
 
-  <!-- Four corner pictures (replace src with your own) -->
-  <img src="muss_1.png" class="corner top-left"  alt="" />
-  <img src="muss_2.png" class="corner top-right" alt="" />
-  <img src="muss_3.jpg" class="corner bottom-left"  alt="" />
-  <img src="muss_4.png" class="corner bottom-right" alt="" />
+  NOTES
+  - `img` is optional per item. If provided, it will be shown above the question.
+  - You can add more courses and chapters freely.
+  - You can include Markdown-like line breaks in q/a using \n; they will be rendered with <br>.
+  - All progress is stored in localStorage per chapter+mode (can be reset from UI).
+  ===============================================================
+  -->
 
-  <!-- YES / NO buttons -->
-  <div class="buttons">
-    <button id="yesBtn" class="btn yes">YES</button>
-    <button id="noBtn"  class="btn no">NO</button>
-  </div>
+  <header class="sticky top-0 z-50 bg-white/70 backdrop-blur border-b border-zinc-200 dark:bg-zinc-900/70 dark:border-zinc-800">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <button id="homeBtn" class="flex items-center gap-2 text-zinc-700 dark:text-zinc-200 hover:opacity-80" title="Home (H)">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+          <path d="M11.47 3.84a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 0 1-1.06 1.06l-.9-.9V20a2 2 0 0 1-2 2h-3.25a.75.75 0 0 1-.75-.75V15a.75.75 0 0 0-.75-.75h-2.5A.75.75 0 0 0 9.5 15v6.25a.75.75 0 0 1-.75.75H5.5a2 2 0 0 1-2-2v-7.31l-.9.9a.75.75 0 1 1-1.06-1.06l8.69-8.69Z"/>
+        </svg>
+        <span class="font-semibold">Study Trainer</span>
+      </button>
+      <div class="flex items-center gap-2">
+        <button id="darkToggle" class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" title="Toggle theme (T)">Toggle Theme</button>
+      </div>
+    </div>
+  </header>
 
-  <!-- Full-screen image overlay -->
-  <div id="overlay">
-    <img id="overlayImg" src="muss_5.png" alt="" />
-  </div>
+  <main id="app" class="max-w-5xl mx-auto px-4 py-6">
+    <!-- Content injected by JS router -->
+  </main>
 
-  <script src="script.js"></script>
+  <footer class="max-w-5xl mx-auto px-4 py-10 text-center text-xs text-zinc-500">
+    <p>Built for quick studying. Swipe left = "Don’t know", right = "I know". Keyboard: ← / →, Space = reveal, H = home, T = theme.</p>
+  </footer>
+
+  <script>
+    /*************************
+     * Utility & State
+     *************************/
+    const $ = (sel, el=document) => el.querySelector(sel);
+    const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+
+    const STORAGE_KEYS = {
+      theme: 'trainer.theme',
+      progress: (chapterId, mode) => `trainer.progress.${chapterId}.${mode}`,
+      known:   (chapterId) => `trainer.known.${chapterId}` // for training persistence if desired
+    };
+
+    function setTheme(dark) {
+      const root = document.documentElement;
+      if (dark) { root.classList.add('dark'); localStorage.setItem(STORAGE_KEYS.theme, 'dark'); }
+      else { root.classList.remove('dark'); localStorage.setItem(STORAGE_KEYS.theme, 'light'); }
+    }
+
+    // Theme init
+    setTheme(localStorage.getItem(STORAGE_KEYS.theme) === 'dark');
+
+    // Basic router state
+    const State = {
+      data: null, // loaded JSON
+      view: 'home',
+      params: {},
+    };
+
+    // Sample fallback data (empty chapters for you to fill later)
+    const SAMPLE_CHAPTERS = {
+      courses: [
+        {
+          id: 'comp-arch',
+          name: 'Computer Architecture',
+          chapters: [
+            { id: 'internal-memory', name: 'Internal Memory', items: [] },
+            { id: 'flash-ddr', name: 'Flash & DDR', items: [] },
+            { id: 'ssds', name: 'How SSDs really work', items: [] }
+          ]
+        }
+      ]
+    };
+
+    async function loadData() {
+      try {
+        const res = await fetch('chapters.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('chapters.json not found');
+        const json = await res.json();
+        if (!json || !Array.isArray(json.courses)) throw new Error('Invalid schema');
+        return json;
+      } catch (e) {
+        console.warn('Using SAMPLE_CHAPTERS fallback. Reason:', e.message);
+        return SAMPLE_CHAPTERS;
+      }
+    }
+
+    /*************************
+     * Rendering helpers
+     *************************/
+    function renderHome() {
+      const courses = State.data.courses || [];
+      const cards = courses.map(c => `
+        <button class="group rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 hover:shadow transition bg-white dark:bg-zinc-900" onclick="location.hash = '#/course/${c.id}'">
+          <div class="aspect-square rounded-xl bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-700 mb-3 flex items-center justify-center">
+            <span class="text-3xl">📚</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-semibold">${escapeHtml(c.name)}</h3>
+              <p class="text-sm text-zinc-500">${c.chapters?.length || 0} chapter(s)</p>
+            </div>
+            <span class="opacity-0 group-hover:opacity-100 transition">→</span>
+          </div>
+        </button>
+      `).join('');
+
+      $('#app').innerHTML = `
+        <h1 class="text-2xl font-bold mb-4">Choose a course</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">${cards}</div>
+      `;
+    }
+
+    function getCourseById(id) {
+      return State.data.courses.find(c => c.id === id);
+    }
+    function getChapterById(course, chapterId) {
+      return (course.chapters || []).find(ch => ch.id === chapterId);
+    }
+
+    function renderCourse(courseId) {
+      const course = getCourseById(courseId);
+      if (!course) return renderNotFound();
+      const cards = (course.chapters || []).map(ch => `
+        <button class="group rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 hover:shadow transition bg-white dark:bg-zinc-900" onclick="location.hash = '#/chapter/${course.id}/${ch.id}'">
+          <div class="aspect-square rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-800 dark:to-indigo-700 mb-3 flex items-center justify-center">
+            <span class="text-3xl">🗂️</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-semibold">${escapeHtml(ch.name)}</h3>
+              <p class="text-sm text-zinc-500">${ch.items?.length || 0} card(s)</p>
+            </div>
+            <span class="opacity-0 group-hover:opacity-100 transition">→</span>
+          </div>
+        </button>
+      `).join('');
+
+      $('#app').innerHTML = `
+        <div class="flex items-center justify-between mb-4">
+          <h1 class="text-2xl font-bold">${escapeHtml(course.name)}</h1>
+          <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" onclick="location.hash = '#/'">Home</button>
+        </div>
+        <p class="text-zinc-500 mb-4">Pick a chapter.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">${cards}</div>
+      `;
+    }
+
+    function renderChapter(courseId, chapterId) {
+      const course = getCourseById(courseId);
+      const chapter = course && getChapterById(course, chapterId);
+      if (!chapter) return renderNotFound();
+
+      $('#app').innerHTML = `
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-bold">${escapeHtml(chapter.name)}</h1>
+            <p class="text-zinc-500">${escapeHtml(course.name)}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" onclick="location.hash = '#/course/${course.id}'">Back</button>
+            <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" onclick="location.hash = '#/'">Home</button>
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+            <h2 class="font-semibold mb-2">In Order</h2>
+            <p class="text-sm text-zinc-500 mb-4">Go through all cards sequentially. Mark known/unknown and track your score.</p>
+            <div class="flex items-center gap-2">
+              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="startQuiz('${course.id}','${chapter.id}','order')">Start</button>
+              <label class="inline-flex items-center gap-2 text-sm"><input id="shuffle-order" type="checkbox" class="rounded border-zinc-300"/> Shuffle</label>
+            </div>
+          </div>
+          <div class="rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+            <h2 class="font-semibold mb-2">Training</h2>
+            <p class="text-sm text-zinc-500 mb-4">Adaptive practice. Known cards disappear; unknown cards reappear after 4 others.</p>
+            <div class="flex items-center gap-2">
+              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="startQuiz('${course.id}','${chapter.id}','training')">Start</button>
+              <label class="inline-flex items-center gap-2 text-sm"><input id="shuffle-training" type="checkbox" class="rounded border-zinc-300"/> Shuffle</label>
+              <label class="inline-flex items-center gap-2 text-sm"><input id="persist-training" type="checkbox" class="rounded border-zinc-300" checked/> Persist progress</label>
+            </div>
+          </div>
+        </div>
+        ${(chapter.items?.length || 0) === 0 ? `<p class='mt-6 text-amber-600 text-sm'>This chapter has no cards yet. Add them in <code>chapters.json</code>.</p>`: ''}
+      `;
+    }
+
+    function renderNotFound() {
+      $('#app').innerHTML = `
+        <div class="text-center py-16">
+          <p class="text-5xl mb-2">🤔</p>
+          <p class="text-lg">Not found.</p>
+          <button class="mt-4 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="location.hash = '#/'">Go Home</button>
+        </div>
+      `;
+    }
+
+    /*************************
+     * Quiz Engine
+     *************************/
+    let quiz = null; // active quiz session state
+
+    function startQuiz(courseId, chapterId, mode) {
+      const course = getCourseById(courseId);
+      const chapter = course && getChapterById(course, chapterId);
+      if (!chapter) return renderNotFound();
+
+      const items = Array.from(chapter.items || []);
+      const shuffle = mode === 'order' ? $('#shuffle-order')?.checked : $('#shuffle-training')?.checked;
+      const persist = mode === 'training' ? $('#persist-training')?.checked : false;
+
+      if (shuffle) shuffleArray(items);
+
+      quiz = createQuizSession({ course, chapter, items, mode, persist });
+      renderQuiz();
+    }
+
+    function createQuizSession({ course, chapter, items, mode, persist }) {
+      const key = STORAGE_KEYS.progress(chapter.id, mode);
+      const saved = JSON.parse(localStorage.getItem(key) || 'null');
+
+      // Build initial queue
+      let queue = items.map((it, idx) => ({ idx, it }));
+
+      let known = new Set();
+      if (mode === 'training' && persist) {
+        const savedKnown = JSON.parse(localStorage.getItem(STORAGE_KEYS.known(chapter.id)) || '[]');
+        known = new Set(savedKnown);
+        if (known.size) {
+          queue = queue.filter(q => !known.has(q.idx));
+        }
+      }
+
+      let state = saved && saved.itemsHash === hashItems(items) ? saved.state : {
+        mode,
+        courseId: course.id,
+        chapterId: chapter.id,
+        current: 0,
+        correct: 0,
+        wrong: 0,
+        queue,
+        known: Array.from(known),
+        reveal: false,
+      };
+
+      function persistState() {
+        localStorage.setItem(key, JSON.stringify({ itemsHash: hashItems(items), state }));
+        if (mode === 'training' && persist) {
+          localStorage.setItem(STORAGE_KEYS.known(chapter.id), JSON.stringify(state.known));
+        }
+      }
+
+      function reset() {
+        state = {
+          mode,
+          courseId: course.id,
+          chapterId: chapter.id,
+          current: 0,
+          correct: 0,
+          wrong: 0,
+          queue: items.map((it, idx) => ({ idx, it })),
+          known: mode === 'training' && persist ? state.known : [],
+          reveal: false,
+        };
+        persistState();
+        renderQuiz();
+      }
+
+      function mark(knownFlag, viaSwipe=false) {
+        if (!state.queue.length) return;
+        const pos = state.current;
+        const card = state.queue[pos];
+
+        // Increment scores
+        if (knownFlag) state.correct++; else state.wrong++;
+
+        if (state.mode === 'order') {
+          // Just move to next; do not re-insert unknowns
+          state.current++;
+        } else {
+          // TRAINING: known → remove all occurrences; unknown → reinsert after 4
+          if (knownFlag) {
+            // Mark as known and purge from queue
+            if (!state.known.includes(card.idx)) state.known.push(card.idx);
+            // Remove all occurrences of this idx in queue
+            state.queue = state.queue.filter((c, i) => !(c.idx === card.idx && i >= pos));
+            // current stays the same (now points at next card)
+          } else {
+            // Reinsert a copy after 4 positions from current
+            const reinsertionOffset = 4;
+            const insertPos = Math.min(pos + reinsertionOffset + 1, state.queue.length);
+            state.queue.splice(insertPos, 0, { idx: card.idx, it: card.it });
+            state.current++;
+          }
+        }
+
+        state.reveal = false;
+
+        // If we reached end, stop at last index (for order) or finish when queue empty
+        if (state.current >= state.queue.length) state.current = state.queue.length; // indicates done
+        persistState();
+        renderQuiz(knownFlag ? (viaSwipe ? 'right' : null) : (viaSwipe ? 'left' : null));
+      }
+
+      function reveal() { state.reveal = !state.reveal; persistState(); renderQuiz(); }
+
+      function isDone() {
+        if (state.mode === 'order') return state.current >= state.queue.length;
+        return state.queue.length === 0; // training: empty queue means done
+      }
+
+      return { state, reveal, reset, mark, persistState };
+    }
+
+    function renderQuiz(swipedDirection = null) {
+      const { state } = quiz;
+      const course = getCourseById(state.courseId);
+      const chapter = getChapterById(course, state.chapterId);
+
+      const total = (chapter.items || []).length;
+      const done = state.mode === 'order' ? Math.min(state.current, state.queue.length) : (total - state.queue.length - state.known.length);
+      const remaining = state.mode === 'order' ? (state.queue.length - state.current) : state.queue.length;
+
+      let content = '';
+      if (!remaining && state.mode === 'training') {
+        content = `<div class="text-center py-10">
+          <p class="text-5xl mb-3">🎉</p>
+          <p class="text-lg font-semibold mb-1">Training complete</p>
+          <p class="text-sm text-zinc-500 mb-6">You marked all cards as known.</p>
+          <div class="flex items-center justify-center gap-2">
+            <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="location.hash = '#/chapter/${course.id}/${chapter.id}'">Back to chapter</button>
+            <button class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700" onclick="quiz.reset()">Reset</button>
+          </div>
+        </div>`;
+      } else if (state.mode === 'order' && state.current >= state.queue.length) {
+        content = `<div class="text-center py-10">
+          <p class="text-5xl mb-3">✅</p>
+          <p class="text-lg font-semibold mb-1">End of deck</p>
+          <p class="text-sm text-zinc-500 mb-4">Score: <b>${state.correct}</b> known, <b>${state.wrong}</b> unknown</p>
+          <div class="flex items-center justify-center gap-2">
+            <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="quiz.reset()">Restart</button>
+            <button class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700" onclick="location.hash = '#/chapter/${course.id}/${chapter.id}'">Back</button>
+          </div>
+        </div>`;
+      } else {
+        const card = state.queue[state.current];
+        const q = card?.it?.q || '(No question)';
+        const a = card?.it?.a || '(No answer)';
+        const img = card?.it?.img || null;
+
+        content = `
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-xl font-bold">${escapeHtml(chapter.name)} <span class="text-sm font-normal text-zinc-500">(${escapeHtml(course.name)})</span></h1>
+              <p class="text-sm text-zinc-500">Mode: <b>${state.mode === 'order' ? 'In Order' : 'Training'}</b></p>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="px-2 py-1 rounded bg-green-600/10 text-green-700 dark:text-green-400">Known: ${state.correct}</span>
+              <span class="px-2 py-1 rounded bg-rose-600/10 text-rose-700 dark:text-rose-400">Unknown: ${state.wrong}</span>
+              <span class="px-2 py-1 rounded bg-zinc-600/10">Remaining: ${remaining}</span>
+            </div>
+          </div>
+
+          <div class="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+            <div class="h-full bg-indigo-600" style="width: ${(total ? (done/total*100) : 0).toFixed(1)}%"></div>
+          </div>
+
+          <div id="card" class="relative rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow p-4 md:p-6 select-none">
+            ${img ? `<img src="${escapeAttr(img)}" alt="" class="w-full max-h-56 object-contain rounded-xl mb-3">` : ''}
+            <div class="mb-2 text-sm uppercase tracking-wide text-zinc-500">Question</div>
+            <div class="text-lg md:text-xl font-medium whitespace-pre-wrap">${escapeHtml(q)}</div>
+            <div class="mt-4 border-t border-zinc-200 dark:border-zinc-800 pt-4">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-sm uppercase tracking-wide text-zinc-500">Answer</div>
+                <button id="revealBtn" class="text-sm px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">${state.reveal ? 'Hide' : 'Reveal'} (Space)</button>
+              </div>
+              <div id="answer" class="text-base md:text-lg whitespace-pre-wrap ${state.reveal ? '' : 'blur-sm select-none'}">${escapeHtml(a)}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <button id="btnNo" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-rose-600 text-white hover:bg-rose-700">
+              <span>← Don’t know</span>
+            </button>
+            <button id="btnYes" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600 text-white hover:bg-green-700">
+              <span>I know →</span>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between text-xs text-zinc-500">
+            <div>Hotkeys: ← / → to mark • Space to reveal • H = Home • T = Theme</div>
+            <div class="flex items-center gap-2">
+              <button class="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700" onclick="quiz.reset()">Reset</button>
+              <button class="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700" onclick="location.hash = '#/chapter/${course.id}/${chapter.id}'">Exit</button>
+            </div>
+          </div>
+        </div>`;
+      }
+
+      $('#app').innerHTML = content;
+
+      // Wire up interactions
+      const cardEl = $('#card');
+      if (cardEl && swipedDirection) {
+        cardEl.classList.add(swipedDirection === 'left' ? 'swipe-left' : 'swipe-right');
+        setTimeout(() => { cardEl?.classList.remove('swipe-left','swipe-right'); }, 220);
+      }
+
+      $('#revealBtn')?.addEventListener('click', () => quiz.reveal());
+      $('#btnNo')?.addEventListener('click', () => quiz.mark(false));
+      $('#btnYes')?.addEventListener('click', () => quiz.mark(true));
+
+      // Swipe handling
+      if (cardEl) initSwipe(cardEl, {
+        onLeft: () => quiz.mark(false, true),
+        onRight: () => quiz.mark(true, true)
+      });
+    }
+
+    /*************************
+     * Router
+     *************************/
+    function route() {
+      const hash = location.hash.replace(/^#\/?/, ''); // remove leading #/
+      const parts = hash.split('/').filter(Boolean);
+      if (!parts.length) { State.view = 'home'; State.params = {}; return renderHome(); }
+
+      if (parts[0] === 'course' && parts[1]) {
+        State.view = 'course'; State.params = { courseId: parts[1] }; return renderCourse(parts[1]);
+      }
+      if (parts[0] === 'chapter' && parts[1] && parts[2]) {
+        State.view = 'chapter'; State.params = { courseId: parts[1], chapterId: parts[2] }; return renderChapter(parts[1], parts[2]);
+      }
+      return renderNotFound();
+    }
+
+    /*************************
+     * Events & Init
+     *************************/
+    $('#homeBtn').addEventListener('click', () => location.hash = '#/');
+    $('#darkToggle').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'h' || e.key === 'H') { location.hash = '#/'; }
+      if (e.key === 't' || e.key === 'T') { setTheme(!document.documentElement.classList.contains('dark')); }
+      if (!quiz) return;
+      if (e.code === 'Space') { e.preventDefault(); quiz.reveal(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); quiz.mark(false); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); quiz.mark(true); }
+    });
+
+    // Swipe util
+    function initSwipe(el, { onLeft, onRight }) {
+      let startX = 0, startY = 0, dragging = false;
+      el.addEventListener('touchstart', (e) => {
+        const t = e.touches[0]; startX = t.clientX; startY = t.clientY; dragging = true;
+      });
+      el.addEventListener('touchmove', (e) => {
+        if (!dragging) return; // optional visual drag could be added here
+      });
+      el.addEventListener('touchend', (e) => {
+        if (!dragging) return; dragging = false;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - startX; const dy = t.clientY - startY;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) onLeft && onLeft(); else onRight && onRight();
+        }
+      });
+    }
+
+    // Helpers
+    function escapeHtml(str='') { return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s])); }
+    function escapeAttr(str='') { return String(str).replace(/"/g, '&quot;'); }
+    function shuffleArray(arr) { for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+    function hashItems(items){ // cheap stable hash of q+a content
+      const s = items.map(it => `${it.q}|${it.a}|${it.img||''}`).join('\u0001');
+      let h=0; for (let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return h;
+    }
+
+    // Boot
+    (async function init(){
+      State.data = await loadData();
+      route();
+      window.addEventListener('hashchange', route);
+    })();
+  </script>
 </body>
 </html>

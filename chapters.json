@@ -1,0 +1,48 @@
+{
+  "courses": [
+    {
+      "name": "Computer Architectures",
+      "chapters": [
+        {
+          "name": "Arithmetic",
+          "items": [
+            { "q": "What does the ALU do, and what data types can it handle?", "a": "Executes arithmetic/logic; always integers, and floating-point via an on-chip FPU or separate coprocessor." },
+            { "q": "Which two signed integer representations are covered?", "a": "Sign-magnitude and two’s complement." },
+            { "q": "Why is two’s complement preferred over sign-magnitude?", "a": "Single zero, uniform add/sub logic (no special sign handling)." },
+            { "q": "How do you negate a two’s-complement value?", "a": "Bitwise NOT then +1 (to LSB)." },
+            { "q": "Give the 8-bit range for two’s complement.", "a": "−128 (1000 0000) to +127 (0111 1111)." },
+            { "q": "What happens when negating −128 in 8-bit two’s complement?", "a": "It stays −128 (overflow case); sign should flip but cannot." },
+            { "q": "How do you sign-extend when widening?", "a": "Copy the sign bit: pad with 0s if positive, 1s if negative." },
+            { "q": "Rule shown on slides for detecting overflow in add/sub?", "a": "Monitor the sign bit — overflow if it changes unexpectedly." },
+            { "q": "How is subtraction implemented in hardware?", "a": "a − b = a + (two’s complement of b); only need adder + complementer." },
+            { "q": "Why can one adder unit do both add and sub?", "a": "Because subtraction is addition with complemented subtrahend." },
+            { "q": "What is the 'schoolbook' unsigned binary multiplication method?", "a": "For each 1 in multiplier → add shifted multiplicand; for 0 → add 0; sum partial products; result is double-length." },
+            { "q": "How to handle signed multiplication (simple way)?", "a": "Convert to positive, multiply, negate if signs differ." },
+            { "q": "What algorithm handles signed multiplication efficiently?", "a": "Booth’s algorithm." },
+            { "q": "Why is Booth’s algorithm useful?", "a": "Reduces additions for runs of 1s in the multiplier (efficient signed multiply)." },
+            { "q": "What’s the basis of unsigned binary division?", "a": "Long-division style: shift, subtract, set quotient bits; track remainder." },
+            { "q": "Why are signed divisions tricky?", "a": "Extra complexity handling signs and edge cases; algorithm given for unsigned with flowchart." },
+            { "q": "Write the general floating-point form used.", "a": "± (significand) × 2^(exponent)." },
+            { "q": "What does normalization do?", "a": "Adjust exponent so mantissa MSB is 1; that leading 1 can be implicit (not stored)." },
+            { "q": "How are signs/exponents stored in FP (per slides)?", "a": "Mantissa in two’s complement; exponent in excess/bias notation (example: excess-128)." },
+            { "q": "What FP range/precision figures are highlighted for 32-bit?", "a": "~±2^256 (≈1.5×10^77) range; ~2^−23 precision ≈ 1.2×10^−7 (~6 decimal digits)." },
+            { "q": "High-level FP add/sub procedure?", "a": "Check zeros → align significands (adjust exponents) → add/sub → normalize." },
+            { "q": "High-level FP mul/div procedure?", "a": "Check zeros → add/sub exponents → mul/div significands → normalize → round (use double-length intermediates)." },
+            { "q": "Which FP standard is referenced?", "a": "IEEE-754 (32/64-bit; extended formats for intermediates)." },
+            { "q": "Example of binary fixed-point from slides?", "a": "1001.1010₂ = 9.625₁₀." },
+            { "q": "Show partial-product pattern for 1011₂ × 1101₂.", "a": "1011, 0000, 1011, 1011 → product 1000 1111₂ (143₁₀), double-length." },
+            { "q": "In unsigned long division, what do partial remainders track?", "a": "The running remainder after each subtract/shift step that drives the next quotient bit." },
+            { "q": "Convert −18₁₀ to 8-bit two’s complement.", "a": "+18 = 0001 0010 → invert = 1110 1101 → +1 = 1110 1110." },
+            { "q": "Sign-extend 8-bit 1001 0010₂ to 16-bit.", "a": "Negative → pad with 1s: 1111 1111 1001 0010." },
+            { "q": "Why is multiply result 'double-length'?", "a": "n-bit × n-bit can require up to 2n bits (sum of shifted partial products)." },
+            { "q": "Booth trigger condition (conceptual)?", "a": "Encodes runs of 1s in the multiplier to reduce adds (handle 10/01 transitions efficiently)." },
+            { "q": "Core steps for unsigned division?", "a": "Align divisor via shifts → compare/subtract → set quotient bit → iterate → final remainder." },
+            { "q": "What does excess-128 mean on an 8-bit exponent?", "a": "Stored exponent = true exponent + 128." },
+            { "q": "Why keep intermediate FP results in double length?", "a": "To avoid precision loss before final rounding/normalization." },
+            { "q": "First step when adding FP numbers with different exponents?", "a": "Shift the smaller significand to align exponents." }
+          ]
+        }
+      ]
+    }
+  ]
+}
