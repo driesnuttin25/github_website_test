@@ -5,6 +5,7 @@
       "name": "Computer Architectures",
       "chapters": [
         {
+
           "id": "arithmetic",
           "name": "Arithmetic",
           "items": [
@@ -43,7 +44,75 @@
             { "q": "Why keep intermediate FP results in double length?", "a": "To avoid precision loss before final rounding/normalization." },
             { "q": "First step when adding FP numbers with different exponents?", "a": "Shift the smaller significand to align exponents." }
           ]
+        },
+        {
+        "id": "internal-memory",
+        "name": "Internal Memory",
+        "items": [
+            { "q": "Explain DRAM vs. SRAM in terms of storage mechanism, speed, density, and cost.", "a": "DRAM: stores bits as charge in capacitors, needs periodic refresh, slower, higher density, cheaper. SRAM: stores bits in flip-flops, no refresh, faster, lower density, more expensive." },
+            { "q": "Why is DRAM essentially analogue in nature?", "a": "Because it stores charge levels on a capacitor that must be sensed and compared to a reference to determine if it's a 0 or 1." },
+            { "q": "Why is DRAM read destructive?", "a": "Reading discharges the capacitor, so the stored data must be rewritten after each read." },
+            { "q": "What is the function of the sense amplifier in DRAM?", "a": "Detects tiny voltage differences on the bitline caused by the cell and amplifies them to full logic levels, also restoring the cell’s charge." },
+            { "q": "Explain the concept of row and column multiplexing in DRAM.", "a": "DRAM uses the same address pins for row and column addresses; RAS selects the row, CAS selects the column, reducing pin count." },
+            { "q": "Why is refresh required for DRAM?", "a": "Charge leaks over time from capacitors; refresh restores charge to prevent data loss." },
+            { "q": "Describe the DRAM refresh cycle.", "a": "Each row is read by the sense amplifier (restoring data) and written back before charge decays." },
+            { "q": "What is the difference between asynchronous DRAM and SDRAM?", "a": "Asynchronous DRAM is not tied to a clock, accesses occur in fixed sequences; SDRAM is synchronized to the system clock, enabling burst transfers." },
+            { "q": "Why is SDRAM faster than conventional DRAM?", "a": "Synchronous operation with CPU clock, pipelined commands, and burst transfers reduce latency per word." },
+            { "q": "What is DDR SDRAM and how does it improve performance?", "a": "Double Data Rate SDRAM transfers data on both rising and falling edges of the clock, doubling throughput without increasing clock frequency." },
+            { "q": "What is the prefetch architecture in DDR?", "a": "The number of bits fetched internally per read command; DDR2 = 4-bit, DDR3 = 8-bit prefetch." },
+            { "q": "What improvement does DDR2 have over DDR?", "a": "Higher speeds, lower voltage (1.8V vs 2.5V), improved signaling and prefetching." },
+            { "q": "What improvement does DDR3 have over DDR2?", "a": "Even higher speeds, lower voltage (1.5V), improved power efficiency, larger prefetch." },
+            { "q": "What is memory interleaving?", "a": "Splitting memory into multiple banks and accessing them in parallel to increase effective throughput and hide latency." },
+            { "q": "What is ECC memory and what can it correct?", "a": "Error-Correcting Code memory detects and corrects single-bit errors and detects (but cannot correct) double-bit errors (SECDED)." },
+            { "q": "Difference between hard failure and soft error in memory.", "a": "Hard failure is a permanent defect in the memory cell or circuit. Soft error is a temporary bit flip caused by environmental factors like cosmic rays." },
+            { "q": "List ROM types in order of least to most rewritable.", "a": "Mask ROM → PROM → EPROM → EEPROM → Flash." },
+            { "q": "How is an EPROM erased?", "a": "Using ultraviolet light through a quartz window to discharge the floating gates." },
+            { "q": "How is EEPROM erased?", "a": "Electrically, allowing selective byte erasure and rewriting." },
+            { "q": "Why is SRAM used for cache memory?", "a": "Extremely low latency and high-speed random access, no refresh requirement." },
+            { "q": "Order the memory hierarchy from fastest to slowest.", "a": "Registers → L1 cache → L2 cache → L3 cache → DRAM → SSD/HDD." },
+            { "q": "Difference between NOR and NAND flash.", "a": "NOR: direct random access, good for code execution, more expensive, lower density. NAND: faster for sequential data, higher density, lower cost, requires page/block operations." },
+            { "q": "Define a flash memory page and block.", "a": "Page: smallest read/write unit. Block: group of pages, smallest erase unit." },
+            { "q": "Why must flash memory be erased before rewriting?", "a": "Because flash stores charge on a floating gate; erasure resets all cells in a block to 1 before programming new data." },
+            { "q": "Compare SLC, MLC, and TLC flash.", "a": "SLC: 1 bit/cell, fastest, most durable, most expensive. MLC: 2 bits/cell, balanced cost and performance. TLC: 3 bits/cell, cheapest, lowest endurance and speed." },
+            { "q": "What is the TRIM command in SSDs?", "a": "Tells the SSD which data blocks are no longer needed, allowing the controller to erase them in advance for faster future writes." },
+            { "q": "What is wear leveling in flash memory?", "a": "A technique to distribute write/erase cycles evenly across all blocks to extend lifespan." },
+            { "q": "What is the main storage medium in SSDs?", "a": "NAND flash memory cells." },
+            { "q": "What does the SSD controller do?", "a": "Manages mapping logical to physical addresses, wear leveling, garbage collection, error correction, and bad block management." },
+            { "q": "What is garbage collection in SSDs?", "a": "The process of consolidating valid data and erasing unused blocks to make space for new writes." },
+            { "q": "What is write amplification?", "a": "The ratio of physical writes to host writes; occurs when extra writes are needed due to block erasures and data movement." },
+            { "q": "Why does an SSD slow down when nearly full?", "a": "Less free space means more data movement during writes, increasing latency." },
+            { "q": "How do SSDs handle bad blocks?", "a": "By marking them as unusable and remapping data to spare blocks using the controller." },
+            { "q": "Why are sequential writes generally faster than random writes in SSDs?", "a": "Because they can be written in large continuous chunks, minimizing block erases and data movement." },
+            { "q": "How does over-provisioning improve SSD performance?", "a": "It reserves extra flash space for the controller to manage wear leveling and garbage collection more efficiently." }
+        ]
+        },
+        {
+        "id": "external-memory",
+        "name": "External Memory",
+        "items": [
+            { "q": "List the three main types of external memory covered in the course.", "a": "Magnetic disk, optical storage (CD/DVD/Blu-ray), and magnetic tape." },
+            { "q": "Why is glass now preferred over aluminium for magnetic disk substrates?", "a": "Glass offers improved surface uniformity (reliability), fewer defects (reduced errors), supports lower flying heights, better stiffness, and higher shock resistance." },
+            { "q": "Describe the basic read/write process on a magnetic disk.", "a": "Write: current through the coil produces a magnetic field that changes polarity on the disk surface. Read (traditional): moving magnetic field induces current in the coil. Read (modern): separate magnetoresistive head detects changes in resistance due to magnetic field direction." },
+            { "q": "What is the difference between CAV and zone bit recording?", "a": "CAV rotates at constant speed, same bits per track (outer tracks waste space). Zone bit recording uses zones with more bits per outer track to increase capacity." },
+            { "q": "What are tracks, sectors, and cylinders?", "a": "Tracks: concentric circles on the platter. Sectors: smallest addressable storage unit within a track. Cylinder: all tracks aligned vertically across platters." },
+            { "q": "Explain the difference between fixed-head and movable-head disks.", "a": "Fixed-head: one head per track, no head movement. Movable-head: one head per platter side, mounted on an arm that moves between tracks." },
+            { "q": "Why use multiple platters in a hard drive?", "a": "To increase capacity and performance; aligned heads form cylinders so data can be read/written across platters with less head movement." },
+            { "q": "Define seek time, rotational latency, and access time.", "a": "Seek time: time to position head over correct track. Rotational latency: time waiting for desired sector to rotate under head. Access time = seek + latency." },
+            { "q": "What is RAID and why is it used?", "a": "Redundant Array of Independent/Inexpensive Disks; combines multiple physical disks for higher speed, capacity, and/or fault tolerance using striping, mirroring, or parity." },
+            { "q": "Summarize RAID 0, 1, 5, and 6.", "a": "RAID 0: striped, no redundancy, max speed. RAID 1: mirrored, high reliability, costlier. RAID 5: striped with distributed parity, balanced performance/reliability. RAID 6: like RAID 5 but with two parity blocks for higher fault tolerance." },
+            { "q": "Why is RAID 2 rarely used?", "a": "It uses bit-level striping with multiple dedicated parity disks for Hamming code error correction, making it expensive and overly redundant." },
+            { "q": "Explain the principle of optical storage (CD/DVD).", "a": "Data stored as pits and lands on a reflective surface; read by laser detecting changes in reflectivity. Smaller pits and shorter wavelength lasers increase capacity." },
+            { "q": "What does 'constant linear velocity' mean in CD drives?", "a": "Disc speed varies so that data passes under the laser at a constant rate, ensuring uniform bit density across the spiral track." },
+            { "q": "What’s the capacity difference between DVD and Blu-ray single layers?", "a": "DVD single layer: ~4.7 GB; Blu-ray single layer: ~25 GB." },
+            { "q": "Why can random access be slow on CD-ROMs?", "a": "Requires moving the head to approximate position, adjusting rotational speed, and reading addresses before reaching target data." },
+            { "q": "What is the main advantage of CD-RW over CD-R?", "a": "CD-RW can be erased and rewritten using phase-change materials, while CD-R is write-once." },
+            { "q": "Why did Blu-ray achieve higher capacity than DVD?", "a": "Uses a shorter wavelength blue-violet laser, smaller pits, and a data layer closer to the surface for tighter focus and less distortion." },
+            { "q": "What is magnetic tape mainly used for today?", "a": "Backup and archival storage due to low cost per bit and high capacity, despite slow access times." },
+            { "q": "Explain 'serial access' in the context of magnetic tape.", "a": "Data can only be read sequentially from the start to the target location, unlike random access on disks." },
+            { "q": "What is LTO and why is it important?", "a": "Linear Tape-Open: an open-standard high-capacity magnetic tape format for enterprise backup, evolving through multiple generations with increasing capacity and transfer rates." }
+        ]
         }
+
       ]
     }
   ]
