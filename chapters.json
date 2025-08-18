@@ -329,7 +329,130 @@
         { "q": "Wat is triggerenergie bij binaire sensoren en waarom relevant?", "a": "Minimale energieverandering om de drempel te overschrijden; te hoge triggerenergie verstoort het systeem (back-action), te laag verhoogt valse triggers." },
         { "q": "Welke twee fouten introduceert een belastingsweerstand bij potmeteruitlezing?", "a": "1) Schaalfout (gain-verandering). 2) Niet-lineariteit (α-afhankelijk); beide worden erger bij lagere RL ten opzichte van R." }
       ]
+    },
+      {
+      "id": "image-sensors-2",
+      "name": "Global Shutter Pixels & 3D Imaging",
+      "items": [
+        { "q": "What is the main problem of rolling shutter readout?", "a": "Rolling shutter exposes rows sequentially, leading to motion artifacts such as skew, wobble, or partial exposure when objects move quickly or illumination is pulsed." },
+        { "q": "How does a global shutter solve the rolling shutter problem?", "a": "Global shutter exposes all pixels simultaneously and stores charge before readout, eliminating motion-induced distortions and enabling flash synchronization." },
+        { "q": "Why not simply increase the readout speed in rolling shutter to solve distortion?", "a": "Higher readout speed reduces distortion but decreases exposure time, lowering SNR. It also does not allow synchronized flash exposure since rows are still staggered." },
+        { "q": "What is the difference between triggered and pipelined global shutter operation?", "a": "Triggered GS: all pixels expose at the same time, then read out later. Pipelined GS: exposure of one frame overlaps with readout of the previous frame, improving throughput but requiring in-pixel storage." },
+        { "q": "Why is global shutter important for active NIR illumination systems like 3D cameras?", "a": "It allows precise synchronization of short light pulses with exposure, rejecting background light and improving depth accuracy." },
+        { "q": "Define shutter efficiency and parasitic light sensitivity (PLS).", "a": "Shutter efficiency = 1 − PLS. PLS is the sensitivity of the memory node relative to the photodiode. Low PLS (e.g., −80 dB) means high shutter efficiency, crucial in bright or fast scenes." },
+        { "q": "What is the principle of a 5T global shutter pixel and its limitation?", "a": "A 5T pixel uses one storage node per pixel for global shuttering. Limitation: poor shutter efficiency, reset noise, and leakage, making it unsuitable for high-performance imaging." },
+        { "q": "What improvements are offered by 6T and 7T GS pixels?", "a": "They add extra transistors for correlated double sampling (CDS), improving noise and shutter efficiency. Drawback: larger area and higher fixed pattern noise from transistor mismatches." },
+        { "q": "What is a charge-domain global shutter pixel?", "a": "It stores charge (not voltage) in dedicated storage nodes before readout, enabling true correlated double sampling, lower noise, and better area efficiency than voltage-domain GS pixels." },
+        { "q": "What are the drawbacks of charge-domain GS pixels?", "a": "Reduced full-well capacity (storage split between nodes), potential smear from incomplete transfer, and integration challenges in back-side illuminated (BSI) sensors." },
+        { "q": "What is the function of deep trench isolation (DTI) in GS pixels?", "a": "DTI isolates pixels to reduce optical/electrical crosstalk, lowers dark current, prevents blooming, and improves shutter efficiency in GS designs." },
+        { "q": "Explain the principle of direct Time-of-Flight (dTOF) imaging.", "a": "A short laser pulse is sent out and photon arrival times are measured with SPADs. Distance is calculated from time delay. Requires histogramming electronics and TDCs." },
+        { "q": "What is pile-up distortion in dTOF?", "a": "At high photon flux, only the first photon is detected while later photons are ignored, biasing distance measurements towards shorter values." },
+        { "q": "Explain the principle of indirect TOF (iTOF).", "a": "The sensor uses modulated light and correlates incoming signals with reference modulation by gating charges into bins. Depth is extracted from phase shift or charge ratios." },
+        { "q": "Give the distance formulas used in iTOF.", "a": "For pulsed iTOF: d = c·t·(Q2/(Q1+Q2))/2. For continuous wave (CW) iTOF: d = (c·t/(2π))·arctan((Q3−Q4)/(Q1−Q2))." },
+        { "q": "What special pixel feature enables iTOF operation?", "a": "Dual storage bins with very fast gates (tens of MHz) that direct charge depending on the modulation phase. Gates are designed to be unidirectional to prevent charge leakage." },
+        { "q": "How does stereovision calculate depth?", "a": "It uses two cameras with a fixed baseline. The disparity between the two projected points on the image plane is inversely proportional to depth." },
+        { "q": "What are the main challenges in stereovision?", "a": "Finding correct matches between left and right images, handling textureless surfaces, limited depth resolution for distant objects, and correcting lens distortions." },
+        { "q": "Explain the principle of structured light 3D imaging.", "a": "A projector casts a known coded pattern on the scene. A camera records the deformed pattern. By triangulation with known baseline, the depth map is reconstructed." },
+        { "q": "What encoding methods are used for structured light?", "a": "Spatial coding (unique dot or stripe patterns), temporal coding (binary or Gray code sequences), and hybrid methods used in systems like Kinect or Artec scanners." },
+        { "q": "Compare stereovision, structured light, and TOF approaches.", "a": "Stereovision: passive, lower hardware cost but complex matching. Structured light: active, better correspondence but sensitive to ambient light. TOF: direct depth, robust in low texture but sensitive to multipath and requires high-speed electronics." },
+        { "q": "Why is shutter efficiency especially important in 3D imaging systems?", "a": "Because short NIR light bursts must be captured precisely; if parasitic light leaks into storage nodes, depth measurements degrade due to background contamination." },
+        { "q": "What is the trade-off between pixel size and 3D resolution in TOF systems?", "a": "Larger pixels allow more light collection and better SNR but limit spatial resolution. Smaller pixels give higher resolution but lower sensitivity and require stronger illumination." }
+      ]
+  },
+      {
+      "id": "actuatoren",
+      "name": "Actuatoren",
+      "items": [
+        { "q": "Wat is een actuator en hoe verschilt het van een sensor?", "a": "Een actuator zet elektrische energie om in een fysieke grootheid (meestal mechanische beweging of kracht). Een sensor doet het omgekeerde: die zet een fysieke grootheid om in een elektrisch signaal. Samen vormen ze de basis van een regelsysteem." },
+
+        { "q": "Wat zijn de belangrijkste types actuatoren besproken in de cursus?", "a": "DC motoren (met borstels), borstelloze DC motoren (BLDC), stappenmotoren. Daarnaast worden voedingen en signaalconversiesystemen (ADC/DAC) behandeld als noodzakelijke componenten voor actuatoren." },
+
+        { "q": "Hoe werkt een geborstelde DC motor technisch gezien?", "a": "De rotor bevat spoelen die bekrachtigd worden. Door Lorentzkracht ontstaat een koppel dat de rotor laat draaien. De collector en borstels zorgen voor commutatie: het wisselen van stroomrichting zodat de motor blijft draaien. Het toerental is ruwweg evenredig met de spanning, het koppel met de stroom." },
+        { "q": "Wat zijn typische voor- en nadelen van geborstelde DC motoren?", "a": "Voordelen: eenvoudig aan te sturen (enkel spanning/stroom regelen), goedkoop, robuust. Nadelen: slijtage van borstels, vonkvorming, beperkte levensduur en efficiëntie." },
+        { "q": "Hoe regel je de snelheid van een DC motor?", "a": "Door de aangelegde spanning te variëren. Voor koppelregeling wordt de stroom geregeld. PWM (pulse width modulation) is een veelgebruikte techniek." },
+        { "q": "Wat gebeurt er met de tegen-EMK in een DC motor?", "a": "Tijdens rotatie induceert de rotor een tegen-EMK (back EMF) die evenredig is met de snelheid. Dit beperkt de stroom bij hoge snelheid en maakt snelheidsregeling mogelijk." },
+
+        { "q": "Wat is een borstelloze DC motor (BLDC) en hoe werkt deze?", "a": "Bij een BLDC motor zit de spoel in de stator en de magneet in de rotor. Commutatie gebeurt elektronisch door middel van Hall-sensoren of sensorless technieken. Dit vermijdt borstels en zorgt voor hogere efficiëntie en levensduur." },
+        { "q": "Wat zijn de voordelen en nadelen van BLDC motoren?", "a": "Voordelen: hoge efficiëntie, geen slijtage van borstels, geschikt voor hoge snelheden, betrouwbaar. Nadelen: complexere aansturing, duurdere elektronica nodig." },
+        { "q": "Waarom worden BLDC motoren veel gebruikt in drones en elektrische voertuigen?", "a": "Ze hebben een hoge koppel/gewichtsverhouding, zijn efficiënt, betrouwbaar en onderhoudsvrij. Dit maakt ze ideaal voor toepassingen waar gewicht en autonomie cruciaal zijn." },
+
+        { "q": "Wat is een stappenmotor en hoe werkt hij?", "a": "Een stappenmotor draait in discrete stappen. Elke puls op de spoelen verschuift de rotor met een vaste hoek. Hierdoor kan men exacte positiecontrole bekomen zonder feedbacksensor." },
+        { "q": "Welke soorten stappenmotoren bestaan er?", "a": "Permanent magneet (PM), variabele reluctantie (VR), en hybride (combinatie van beide, meest gebruikt door hoge resolutie en koppel)." },
+        { "q": "Wat zijn voordelen en nadelen van stappenmotoren?", "a": "Voordelen: precieze positiecontrole, eenvoudig aan te sturen, relatief goedkoop. Nadelen: resonanties, beperkt koppel bij hoge snelheid, stappenverlies mogelijk zonder feedback." },
+        { "q": "Wat is microstepping en waarom wordt het toegepast?", "a": "Microstepping stuurt de spoelen aan met sinusvormige stromen waardoor de rotor tussenstappen kan innemen. Dit verhoogt resolutie en vermindert trillingen/resonanties." },
+        { "q": "In welke toepassingen zijn stappenmotoren ideaal en waarom?", "a": "3D-printers, CNC-machines, scanners – overal waar precieze positionering belangrijk is en absolute snelheid minder belangrijk is." },
+
+        { "q": "Wat zijn belastingskarakteristieken en welke 3 types zijn belangrijk voor motoren?", "a": "Constante koppelbelasting (bv. transportband), kwadratisch koppelbelasting (bv. ventilatoren/pompen, koppel ~ snelheid²), constant vermogen belasting (bv. werktuigmachines). De motorselectie moet passen bij het type belasting." },
+
+        { "q": "Wat is het doel van spanningsregulatoren bij actuatoren?", "a": "Zorgen voor een stabiele spanning voor motoren en elektronica. Zonder dit zouden motorsnelheid en gedrag onvoorspelbaar zijn bij spanningsschommelingen." },
+        { "q": "Hoe werkt een lineaire spanningsregelaar en wat zijn de voor- en nadelen?", "a": "Vergelijkt uitgangsspanning met een referentie en stuurt een transistor aan. Voordelen: eenvoudig, weinig ruis. Nadelen: lage efficiëntie, warmteverlies." },
+        { "q": "Hoe werkt een schakelende (switching) spanningsregelaar en wat zijn de voor- en nadelen?", "a": "Schakelt snel tussen aan/uit en gebruikt spoelen en condensatoren om de spanning te filteren. Voordelen: hoge efficiëntie (80–95%). Nadelen: complexer, meer ruis." },
+
+        { "q": "Wat is een ADC en waarom is het belangrijk in motorregeling?", "a": "Een Analoog-naar-Digitaal Converter zet sensorsignalen (stroom, positie, snelheid) om naar digitale waarden voor de controller. Nodig voor feedbackregeling (closed loop)." },
+        { "q": "Wat is een DAC en waarom belangrijk voor actuatoren?", "a": "Een Digitaal-naar-Analoog Converter zet een digitaal stuursignaal om in een analoge spanning of stroom die motorsturing kan aandrijven." },
+        { "q": "Welke soorten ADC's bestaan er en in welke situaties worden ze gebruikt?", "a": "Successieve approximatie (meest gebruikt, snel en nauwkeurig), flash (zeer snel, duur), dual ramp (nauwkeurig, traag), delta-sigma (zeer nauwkeurig, voor lage frequenties)." },
+        { "q": "Wat is quantisatiefout bij ADC’s?", "a": "Omdat een continue ingang wordt afgerond naar discrete stappen, ontstaat er een maximale fout van ±0,5 LSB (least significant bit)." },
+
+        { "q": "Vergelijk DC motor, BLDC motor en stappenmotor in termen van aansturing en toepassingen.", "a": "DC: eenvoudig, geschikt voor variabele snelheid, maar slijtage. BLDC: complexer, geschikt voor hoge prestaties en duurzaamheid. Stappenmotor: precieze positiecontrole zonder feedback, maar beperkt vermogen/snelheid." },
+        { "q": "Welke actuator kies je voor een CNC-machine en waarom?", "a": "Een stappenmotor (of servo) omdat je nauwkeurige en reproduceerbare positionering nodig hebt." },
+        { "q": "Welke actuator kies je voor een drone en waarom?", "a": "Een BLDC motor: hoog vermogen/gewicht, hoge efficiëntie, betrouwbare werking bij hoge snelheden." },
+        { "q": "Waarom is een DC motor geschikt voor speelgoedtoepassingen?", "a": "Eenvoudig en goedkoop aan te sturen, robuust, en lage eisen aan levensduur of efficiëntie." }
+      ]
+    },
+    {
+      "id": "examen-vragen",
+      "name": "Examen Vragen",
+      "items": [
+        { "q": "Metingen worden beïnvloed door statische effecten en statistische effecten (ruis). Wat is het verschil en geef van elk een voorbeeld.", "a": "Statisch = systematisch, reproduceerbaar (middelen ≠ 0): offset, gainfout, niet-lineariteit, hysterese; vb. voltmeter met vaste +20 mV offset. Statistisch = willekeurig (middelen → 0): thermische/shotruis; vb. uitlezing die ±1 mV fluctueert." },
+        { "q": "De tekening toont een meetsysteem. Kies een grootheid en beschrijf de functie (en het principe) van elk blok.", "a": "Voorbeeld temperatuur: (1) Sensor (RTD/thermistor) → elektrisch. (2) Conditionering (brug, buffer/opamp, filtering, S/H). (3) ADC (digitaliseert, resolutie/kwantisatie). (4) Digitale verwerking (linearisatie, calibratie, filtering). (5) Weergave/actuator (display/regellus)." },
+        { "q": "Wat betekenen ‘resolutie’ en ‘meetnauwkeurigheid’? Wat is het verschil en impact op een potentiometer?", "a": "Resolutie = kleinste stap (bv. 1 LSB of mechanische stap). Nauwkeurigheid = nabijheid tot de ware waarde (incl. offset/gain/linearity). Potentiometer: beperkte resolutie → ‘trapjes’; bron-/belastingsweerstanden veroorzaken schaalfout en niet-lineariteit." },
+        { "q": "Wat is hysteresis? Kan je dit schetsen?", "a": "Hysteresis: uitgang hangt af van richting van verandering. Bij oplopen/aflopen verschillende drempels → dode band. Schets: twee S-curves met gescheiden inschakel- en uitschakelniveaus." },
+        { "q": "Bereken de invloed van ladingseffecten (sample-and-hold) in een bron Rs die een ingangscapaciteit Cin laadt gedurende Ts.", "a": "Vhold = Vin·(1 − e^{−Ts/(Rs·Cin)}). Fout ΔV ≈ Vin·e^{−Ts/(Rs·Cin)}. Verminder met lagere Rs, kleinere Cin, langere Ts of bufferversterker (volger)." },
+        { "q": "Bespreek de impact van bron- en belastingsweerstand in een potentiometerschema. Geef Vout als functie van α.", "a": "Ideaal: Vout = α·Vs. Met bron Rs en belasting RL: Vout = Vs · ((α·Rp ∥ RL) / (Rs + (α·Rp ∥ RL) + (1−α)·Rp)). Dit geeft α-afhankelijke niet-lineariteit en schaalfout (kleine RL verergert)." },
+        { "q": "Onbekend schema: hoe bepaal je functie en werking systematisch?", "a": "1) Identificeer bron/sensor. 2) Zoek impedantieaanpassing/brug. 3) Herken conditionering (versterker, filter, gelijkrichting). 4) Isolatie/beveiliging. 5) Conversie (ADC/DAC, S/H). 6) Uitgang/regellus. Koppel blokken aan doel: linearisatie, ruisonderdrukking, domeinconversie." },
+        { "q": "Hoe werkt een rekstrookje (strain gauge)?", "a": "Weerstand van meander verandert met rek ε: ΔR/R = GF·ε. In Wheatstonebrug wordt kleine ΔR naar spanning omgezet; dummy-gauges compenseren temperatuur." },
+        { "q": "Wat is de rekfactor (gauge factor) en hoe optimaliseer je die?", "a": "GF = (ΔR/R)/ε; komt uit geometrie en piezoresistief effect. Optimalisatie: materiaalkeuze (hogere piezoresistiviteit), volle brug, goede mechanische koppeling, temperatuurcompensatie." },
+        { "q": "Conceptuele capacitieve accelerometer: leid ΔC(a) af.", "a": "Massa-veer vormt condensator. Verplaatsing x = a/ω0² (ω0² = k/m). C = εA/(d−x) ⇒ voor kleine x: ΔC ≈ (εA/d²)·x = (εA/d²)·(a/ω0²). Differentiële opstelling verdubbelt gevoeligheid en onderdrukt common-mode." },
+        { "q": "Noem vier methodes om een capacitieve sensor uit te lezen.", "a": "(1) Brugmeting (AC). (2) Transimpedantie (I→V). (3) Oscillator/frequentiemeting (f ∝ 1/C). (4) Tijd-/ladingsmeting (RC-laadtijd, Q-transfer)." },
+        { "q": "Hoe werkt een Hall-element?", "a": "Geleider met stroom I in B-veld → Lorentzkracht duwt ladingsdragers zijwaarts → Hall-spanning VH ∝ I·B/(q·n·t). Output evenredig met B; vaak met conditionering en hysterese." },
+        { "q": "Wat is reluctantie en hoe maak je er een sensor mee? Voorbeeld.", "a": "Reluctantie ℜ = l/(μA). Verplaatsingen die luchtspleet wijzigen veranderen ℜ, dus flux/inductie. Toepassing: inductieve naderingsschakelaar, LVDT/resolver, Inductosyn." },
+        { "q": "Voordelen van LASER t.o.v. LED?", "a": "Laser: smal spectrum, coherentie, collimatie, hoge irradiantie → lange afstand, kleine spot, interferometrie/structured light. LED: goedkoper/robuust maar minder gericht." },
+        { "q": "Hoe werkt een optische encoder? Types, limiterende factor, verbeteringen.", "a": "Lichtbron + raster + detector. Types: incrementeel (A/B, Z) en absoluut (Gray). Resolutie beperkt door lijnafstand/optiek/ruis; verbeter via quadratuur×4, analoge sin/cos-interpolatie, grotere diameter/fijner raster." },
+        { "q": "Nadelen van CCD t.o.v. CMOS beeldsensoren?", "a": "Hoger verbruik, lagere integratie (ADC/logic off-chip), smear/need shutter, trager systeemintegration. CMOS: 4T/PPD, on-chip ADC/logic, lagere power → dominantie in consumentenmarkt." },
+        { "q": "Wat betekent het Fermi-niveau Ef?", "a": "Chemisch potentiaal van elektronen; energie met 50% bezettingskans. In intrinsiek Si ~ midden bandkloof; doping verschuift Ef en beïnvloedt depletie en sensorparameters." },
+        { "q": "Leg het foto-elektrisch effect uit.", "a": "Fotonen met energie hν ≥ Eg genereren e–h-paren; in fotodiode verzamelt intern veld ladingsdragers → fotostroom/meetbaar signaal. QE bepaalt efficiëntie." },
+        { "q": "Verschil tussen ‘gewone’ diode en fotodiode?", "a": "Gewone diode geoptimaliseerd voor geleiding/rectificatie. Fotodiode (omgekeerd gepolariseerd) heeft grotere depletielaag, lage donkerstroom en optische respons → stroom/spanningsverandering bij licht." },
+        { "q": "Wat is de ‘grote truc’ van de pinned photodiode (PPD) en het voordeel?", "a": "Begraven opslag met volledig gedepleteerd startpunt; volledige ladingstransfer naar sense node en CDS → lage kTC-ruis en lage dark current." },
+        { "q": "Rolling vs global shutter: probleem en twee oplossingen.", "a": "Rolling leest rij-per-rij → skew/vervorming. Oplossingen: (1) Voltage-domein GS (5T/6T/8T) met in-pixel opslag; (2) Charge-domein GS met mini-CCD/BSI/DTI. Beide maken simultane belichting mogelijk." },
+        { "q": "Wat is ‘shutter efficiency’ en hoe verbeter je die?", "a": "Shutter efficiency = 1 − PLS (parasitic light sensitivity). Verbeter via lichtschild over opslagnode, DTI, BSI-optimalisaties, golfgeleiders en charge-domein GS." },
+        { "q": "Welke aanpak verwijdert kTC-ruis effectief in pixels?", "a": "Volledige ladingstransfer van PPD naar sense node + correlated double sampling (CDS)." },
+        { "q": "Waarom SPAD-arrays bij direct ToF 3D-camera’s? Wat is een SPAD?", "a": "dToF vereist enkel-foton gevoeligheid en ns/ps-timing. SPAD = single-photon avalanche diode in Geiger-modus; met TDC/histogramming meet je aankomsttijd → afstand." },
+        { "q": "Welke methodes zijn er voor 3D-opname via stereo?", "a": "(1) Passieve stereovisie, (2) Gestructureerd licht (actief), (3) iToF (fase/correlatie), (4) dToF (puls/arrivaltime)." },
+        { "q": "Welke fouten komen in DAC/ADC voor?", "a": "Offset, gain, INL, DNL (→ missing codes, niet-monotonie), ruis/kwantisatie, jitter, referentiefouten." },
+        { "q": "Wat is een inherent monotone DAC? Voor- en nadelen.", "a": "Thermometer-codering of gesegmenteerd ontwerp garandeert monotoniciteit (geen code-terugval). Voordelen: robuust. Nadelen: meer area/complexiteit dan puur R-2R." },
+        { "q": "Hoe werkt een SAR-ADC?", "a": "Binaire zoekactie: interne DAC zet hypothese, comparator beslist, SAR-register update. Na N stappen N-bit resultaat; snel en energiezuinig." },
+        { "q": "Single-ramp vs dual-ramp ADC: werking en welk probleem lost dual-ramp op?", "a": "Single-ramp vergelijkt Vin met lineaire ramp → gevoelig voor ruis/tijdreferentie. Dual-ramp integreert eerst Vin dan −Vref; tijdverhouding ∝ Vin en onderdrukt storingen/ref-ruis." },
+        { "q": "Hoe werkt een delta-sigma (ΔΣ) ADC?", "a": "Oversampling + noise shaping met (bijv.) 1-bit quantizer; digitaal filter/decimatie levert hoge resolutie met eenvoudige analoge blokken." },
+        { "q": "Waarom zorgt de tegen-EMK van een DC-motor voor zelf-regeling?", "a": "Eb = k_e·ω. Bij belasting daalt ω → Eb daalt → Ia = (V − Eb)/Ra stijgt → koppel T = k_t·Ia stijgt en compenseert de belasting." },
+        { "q": "Voorwaarde voor maximaal vermogen van een DC-motor?", "a": "P = T·ω maximaal rond halve onbelast-snelheid: T ≈ ½·Tstall en ω ≈ ½·ω0 (benadering)." },
+        { "q": "Hoe verhoudt koppel van een DC-motor zich tot ankerstroom? Geldt dit altijd?", "a": "T ≈ k_t·Ia (lineair) voor DC en per-fase voor BLDC. Stappenmotoren leveren koppel in discrete stappen; hun koppel daalt sterk met snelheid (pull-in/out)." },
+        { "q": "Welke verliezen treden op in een DC-motor?", "a": "Koper I²R, ijzer (hysterese/wervelstromen), wrijving (lagers/borstels), ventilatie en commutatieverliezen." },
+        { "q": "Vergelijk T–I–ω-curves voor DC, BLDC en stappenmotor en bespreek verschillen.", "a": "DC: T–I lineair; T–ω aflopend; max P rond ½ω0. BLDC: vergelijkbaar maar met elektronische commutatie en brede vlakke T-zone. Stepper: hoog stilstandskoppel, sterk koppelverlies op snelheid (pull-in/pull-out)." },
+        { "q": "Leg de werking van een BLDC uit.", "a": "Statorwikkelingen + rotorpermanenten; elektronische commutatie creëert roterend veld dat rotor volgt (positie via Hall of sensorless)." },
+        { "q": "Hoe wordt een BLDC gevoed/aangestuurd?", "a": "Driefase-inverter (6 MOSFET’s), commutatiesequentie op basis van rotorpositie, PWM voor koppel/snelheid, stroombegrenzing en dead-timebeheer." },
+        { "q": "Hoe werkt positieregeling van een BLDC?", "a": "Positie via Hall/observer; snelheidslus (PI) en eventueel positieslus. FOC (field-oriented control) met sinusstromen reduceert koppelrimpel en verbetert dynamiek." },
+        { "q": "Basisprincipe van een stappenmotor.", "a": "Discrete stappen per puls; positie = som van stappen. Microstepping gebruikt sinusvormige fase-stromen voor tussenposities en minder resonantie." },
+        { "q": "Hoe werkt een hybride stappenmotor en welke voor-/nadelen neemt hij over?", "a": "Combineert permanente magneet en variabele reluctantie: fijne staphoek, hoog koppel/volume. Nadelen: resonanties, koppelval op snelheid (open-loop)." },
+        { "q": "Vergelijk unipolaire met bipolaire aansturing van een stappenmotor.", "a": "Unipolair: eenvoudiger, lagere effectieve koperbenutting/ koppel. Bipolair: H-bruggen, volle wikkeling actief → meer koppel/efficiëntie maar complexer." },
+        { "q": "Hoe beïnvloed je het inschakelgedrag van een stappenmotor via het circuit?", "a": "Stroomchopping/current-mode drivers, microstepping, juiste acceleratieprofielen, voldoende busspanning en ‘decay’-instellingen voor snelle stroomopbouw/afbouw." },
+        { "q": "Impact van inertie op koppel (grafisch, pull-in/out).", "a": "Hoge inertie verschuift pull-in curve naar lagere snelheden; voor dezelfde stapfrequentie is meer koppel nodig om te versnellen → risico op stapverlies zonder ramp-up." },
+        { "q": "Teken/bespreek een voeding die een DC-spanning zonder spikes levert.", "a": "Netfilter (L–C), gelijkrichting (brug), bufferelco met bleeder, snubbers/TVS, decoupling dicht bij last, daarna lineaire of schakelende regelaar met juiste layout/EMI-beheer." },
+        { "q": "Wat is een bleederweerstand?", "a": "Hoge weerstand parallel over buffercondensator om veilig te ontladen en minimale belasting te geven (stabiliteit). Nadeel: continu klein vermogensverlies P = V²/R." }
+      ]
     }
+
+
+
   ]
 }
 
