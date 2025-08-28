@@ -434,9 +434,8 @@
 
       const total = (chapter.items || []).length;
       const seen = uniqueSeenCount();
-      const remaining = state.mode === 'order'
-        ? (state.queue.length - state.current)
-        : state.queue.length;
+      const remaining = total - quiz._sets.knownOnceSet.size;
+
 
       let content = '';
       if (!remaining && state.mode === 'training') {
