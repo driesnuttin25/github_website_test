@@ -454,7 +454,138 @@
 
 
   ]
+},
+{
+  "id": "sensors-actuators",
+  "name": "Sensoren & Actuatoren",
+  "chapters": [
+      {
+        "id": "introduction",
+        "name": "Introduction",
+        "items": [
+          { "q": "Wat is het verschil tussen een communicatie netwerk en een computer netwerk?", "a": "Communicatienetwerk: structuur van entiteiten (mensen, machines) waarin informatie kan stromen op basis van afspraken (protocollen). Computernetwerk: structuur van apparaten (end systems) waarin data kan stromen; dit is een specifiek type communicatienetwerk." },
+          { "q": "Noem drie voordelen van computernetwerken.", "a": "Eenvoudige informatie-uitwisseling tussen eindapparaten; delen van middelen zoals printers; efficiënt gebruik van het communicatiekanaal; flexibel en configureerbaar; minder bekabeling; robuuster en fouttoleranter." },
+          { "q": "Wat is het verschil tussen simplex, half-duplex en full-duplex datatransmissie?", "a": "Simplex: data kan maar in één richting; Half-duplex: data in beide richtingen maar niet tegelijk; Full-duplex: data kan gelijktijdig in beide richtingen." },
+          { "q": "Geef twee voorbeelden van verbindingsvormen en hun toepassing.", "a": "Point-to-point: directe verbinding tussen twee hosts (bv. professor–student gesprek). Multipoint: meerdere apparaten delen één link (bv. professor die les geeft aan een klas)." },
+          { "q": "Wat is het verschil tussen een LAN en een WAN?", "a": "LAN (Local Area Network): klein, bv. binnen een kantoor of gebouw, verbonden via switch. WAN (Wide Area Network): verbindt LANs over grote afstand, bv. via routers en backbone infrastructuur." },
+          { "q": "Beschrijf kort de mesh, star en bus topologie.", "a": "Mesh: elk apparaat verbonden met elk ander, zeer robuust maar veel bekabeling. Star: alle apparaten verbonden via een centrale switch, eenvoudig uit te breiden. Bus: één gedeelde kabel waarop alle apparaten 'tappen', eenvoudig maar kwetsbaar voor fouten." },
+          { "q": "Wat is het verschil tussen een bericht (message) en een pakket (packet)?", "a": "Message: geheel van controle- of gebruikersdata dat verzonden wordt. Voor verzending wordt het opgedeeld in kleinere stukjes met header, dit zijn de packets. Packets worden apart over het netwerk gestuurd en bij de bestemming weer samengevoegd." },
+          { "q": "Wat is packet switching en wat zijn mogelijke defecten onderweg?", "a": "Packet switching: elk bericht wordt opgesplitst in pakketten die elk een eigen pad kunnen nemen via switches en routers. Onderweg kunnen vertragingen, verlies, duplicatie of corruptie optreden door drukke routers, slechte links of configuratiefouten." },
+          { "q": "Leg het store-and-forward principe uit en één nadeel ervan.", "a": "Een switch/router ontvangt eerst een volledig pakket, inspecteert het, en stuurt het daarna door naar de juiste link. Nadeel: extra vertraging door bufferen en wachtrijen." },
+          { "q": "Som de vier soorten packet delays op en leg kort uit.", "a": "Processing delay: tijd om header te inspecteren en op fouten te checken. Queuing delay: wachttijd in de buffer. Transmission delay: tijd om alle bits het medium op te zetten (L/R). Propagation delay: tijd voor een bit om fysiek van zender naar ontvanger te reizen." },
+          { "q": "Bereken de transmissiedelay voor een pakket van 1.500 bytes over een link van 10 Mbps.", "a": "L = 1500 × 8 = 12000 bits. R = 10 Mbps = 10×10^6 bps. ttrans = L/R = 12000 / 10e6 = 0.0012 s = 1.2 ms." },
+          { "q": "Welke tools kunnen gebruikt worden om de route en vertraging van pakketten te meten? Leg uit.", "a": "Traceroute (Linux), tracert (Windows) en mtr (Linux). Ze sturen probe packets met oplopende TTL’s en meten welke routers onderweg antwoorden met ICMP time exceeded. Zo zie je elke hop en de round-trip tijd." }
+        ]
+      },
+      {
+      "id": "layered-model",
+      "name": "Layered Model",
+      "items": [
+        { "q": "Waarom gebruiken we een gelaagd communicatiemodel?", "a": "Omdat complexe communicatie tussen apparaten kan opgesplitst worden in eenvoudige taken. Elke laag voert een specifiek deel van de communicatie uit en biedt een gestandaardiseerde interface naar de lagen erboven en eronder." },
+        { "q": "Wat is het verschil tussen het OSI model en het TCP/IP model?", "a": "OSI: theoretisch referentiemodel met 7 lagen, gepubliceerd in 1984 door ISO. TCP/IP: praktisch protocolstack, ouder en dominant in gebruik, meestal beschreven met 4 of 5 lagen (Application, Transport, Internet, Network Access/Link)." },
+        { "q": "Geef voor elke OSI-laag een belangrijke functie.", "a": "1 Physical: bits als signalen verzenden. 2 Data-Link: frames, fysieke adressering (MAC), foutdetectie. 3 Network: routing, logische adressering (IP). 4 Transport: end-to-end, segmenten, betrouwbaarheid (TCP/UDP). 5 Session: sessiebeheer. 6 Presentation: vertaling, compressie, encryptie. 7 Application: interface naar gebruiker (HTTP, SMTP, DNS)." },
+        { "q": "Geef voor elke OSI-laag een voorbeeld van een protocol.", "a": "Physical: Ethernet (1000BASE-T), WiFi (802.11). Data-Link: PPP, Ethernet II. Network: IPv4, IPv6, ICMP. Transport: TCP, UDP, SCTP. Session: sockets, NetBIOS. Presentation: JPEG, TLS, ASCII/EBCDIC. Application: HTTP(S), DNS, SMTP, FTP, DHCP." },
+        { "q": "Wat is encapsulatie in netwerken?", "a": "Het proces waarbij elke laag eigen headers (en soms trailers) toevoegt aan de data van de bovenliggende laag. Zo wordt een bericht → segment → datagram → frame → bits." },
+        { "q": "Wat is de volgorde van protocol data units (PDU’s) per OSI-laag?", "a": "Physical: bits, Data-Link: frames, Network: packets/datagrams, Transport: segments, Session: SPDU, Presentation: PPDU, Application: APDU." },
+        { "q": "Wat is de rol van standaardisatieorganisaties zoals IEEE en IETF?", "a": "IEEE: standaarden voor fysieke en linklagen (Ethernet, WiFi). IETF: Internetprotocollen zoals TCP/IP en RFC’s. ISO: OSI-model en algemene standaarden. W3C: webstandaarden zoals HTML, HTTP." },
+        { "q": "Wat is het verschil tussen de functie van een switch, router en firewall in termen van lagen?", "a": "Switch: werkt op de Data-Link laag (MAC-adressen). Router: werkt op de Netwerklaag (IP-adressen). Firewall/NAT-router: werkt op Transport + hogere lagen (ports, sockets, filtering)." },
+        { "q": "Hoe verloopt de de-encapsulatie van een datapakket?", "a": "Bij de ontvanger wordt stap voor stap de header/trailer van elke laag verwijderd en de data naar de bovenliggende laag doorgestuurd, tot de applicatie de originele boodschap ontvangt." },
+        { "q": "Wat is het verschil tussen fysieke en logische adressering?", "a": "Fysiek: MAC-adressen op de Data-Link laag, uniek per netwerkkaart. Logisch: IP-adressen op de Netwerklaag, hiërarchisch en nodig voor routing tussen netwerken." },
+        { "q": "Waarom zeggen we dat TCP/IP een protocolsuite is en niet enkel TCP en IP?", "a": "Omdat het veel meer protocollen bevat op verschillende lagen: applicatieprotocollen (HTTP, SMTP, DNS), transportprotocollen (TCP, UDP, SCTP), netwerkprotocollen (IPv4, IPv6, ICMP) en linkprotocollen (Ethernet, WiFi, PPP)." },
+        { "q": "Geef een concreet voorbeeld van encapsulatie met HTTP.", "a": "HTTP bericht → TCP segment met poortnummers → IP datagram met bron- en doeladres → Ethernet frame met bron- en doel-MAC → bits op fysieke laag." }
+      ]
+    },
+    {
+      "id": "link-layer",
+      "name": "Link Layer",
+      "items": [
+        { "q": "Wat is de hoofdtaak van de Link Layer?", "a": "Het versturen van frames tussen knooppunten (1 hop), inclusief framing, mediumtoegang, foutdetectie/correctie en soms betrouwbare overdracht." },
+        { "q": "Welke foutdetectiemethoden bestaan er in de Link Layer?", "a": "Parity check (1-bit fout detectie), Checksum (ones’ complement optelling, volgorde-onafhankelijk), en Cyclic Redundancy Check (CRC, detecteert meerdere fouten via generatorpolynoom)." },
+        { "q": "Wat is het verschil tussen TDM, FDM en CDMA?", "a": "TDM verdeelt de tijd in slots per gebruiker; FDM verdeelt het frequentiespectrum; CDMA gebruikt unieke codes zodat meerdere gebruikers tegelijk dezelfde frequentieband kunnen gebruiken." },
+        { "q": "Wat is CSMA en wat is het verschil met ALOHA?", "a": "CSMA (Carrier Sense Multiple Access) luistert eerst of het kanaal vrij is, ALOHA zendt gewoon en wacht op een ACK. CSMA kan ook collision detectie/avoidance toepassen (CSMA/CD, CSMA/CA)." },
+        { "q": "Geef een voorbeeld van een 'Taking turns'-protocol.", "a": "Polling (centrale master vraagt elke node om te zenden, bv. Bluetooth) of Token Passing (token-ring, FDDI)." },
+        { "q": "Wat is een MAC-adres en welke soorten communicatie ondersteunt Ethernet?", "a": "Een 48-bit hardware-adres, wereldwijd uniek. Ondersteunt unicast (1:1), broadcast (1:all, FF-FF-FF-FF-FF-FF) en multicast (1:n)." },
+        { "q": "Beschrijf kort de Ethernet frame structuur.", "a": "Preamble (8 bytes sync), bron/dest. MAC (6 bytes elk), Type (protocol, bv. IPv4 = 0x0800), Payload (46–1500 bytes), en CRC (4 bytes)." },
+        { "q": "Wat doet een switch op de link layer?", "a": "Verbindt Ethernet-segmenten transparant, houdt een MAC-tabel bij om te filteren/forwarden, en leert zelf welke MAC-adressen op welke poort zitten." },
+        { "q": "Wat is ARP en waarvoor wordt het gebruikt?", "a": "Address Resolution Protocol vertaalt IP-adressen naar MAC-adressen binnen een LAN, door middel van broadcast requests en unicast replies." },
+        { "q": "Wat is een VLAN en waarom wordt het gebruikt?", "a": "Virtual LAN’s segmenteren een netwerk logisch in meerdere broadcast-domeinen voor betere controle, beveiliging en minder broadcastverkeer." },
+        { "q": "Wat is trunking en hoe wordt dit geïmplementeerd?", "a": "Trunking verbindt meerdere VLAN’s over switches. Hiervoor wordt IEEE 802.1Q tagging gebruikt (4-byte extra header met VLAN-ID tot 4096 VLANs)." },
+        { "q": "Wat is DOCSIS en hoe werkt upstream/downstream verkeer?", "a": "Data-Over-Cable Service Interface Specification: kabelmodem standaard. Downstream = één naar veel (FDM), Upstream = veel naar één (CSMA/CD requests en taking-turns voor data)." }
+      ]
+    },
+    {
+      "id": "network-layer",
+      "name": "Network Layer",
+      "items": [
+        { "q": "Wat zijn de belangrijkste taken van de Network Layer?", "a": "Het transporteren van datagrammen tussen hosts via meerdere netwerken. Taken: logisch adresseren (IP), routering (padkeuze), forwarding, fragmentatie, en gebruik van protocollen zoals ICMP." },
+        { "q": "Wat is het verschil tussen direct en indirect routing?", "a": "Direct routing: bron en bestemming in hetzelfde subnet, ARP vertaalt IP naar MAC. Indirect routing: bron en bestemming in verschillende subnetten, pakket gaat via router(s) met behulp van forwarding tables." },
+        { "q": "Wat is het verschil tussen forwarding en routing?", "a": "Forwarding: doorsturen van pakketten volgens de lokale tabel (per hop). Routing: bepalen van de end-to-end route via routing-algoritmes (OSPF, BGP)." },
+        { "q": "Beschrijf kort het IPv4 headerformaat.", "a": "20 bytes standaard header met velden zoals versie, headerlengte, type of service, lengte, identificatie/flags/offset (fragmentatie), TTL, protocol (TCP/UDP), header checksum, bron- en bestemmingsadres, en optioneel extra velden." },
+        { "q": "Wat is fragmentatie in IPv4 en hoe werkt het?", "a": "Wanneer een IP-datagram groter is dan de MTU, splitst de router het op in fragmenten met eigen header. De offset geeft positie aan (in blokken van 8 bytes). Alleen de eindhost voegt de fragmenten weer samen." },
+        { "q": "Wat is CIDR en hoe wordt het genoteerd?", "a": "Classless Inter-Domain Routing vervangt classful indeling. Notatie: IP/prefix (bijv. 192.168.1.0/24). Het aantal 1-bits in de mask geeft het netwerkdeel aan, rest = hosts." },
+        { "q": "Hoeveel bruikbare hosts zijn er in een /24 subnet?", "a": "2^(32-24) = 2^8 = 256 adressen. Min 2 (netwerkadres + broadcast) = 254 bruikbare hostadressen." },
+        { "q": "Noem drie gereserveerde IPv4 adressen en hun betekenis.", "a": "0.0.0.0 (dit host), 127.0.0.1 (loopback), 255.255.255.255 (broadcast). Ook netwerkadres (bijv. 192.168.1.0) en subnet-broadcast (bijv. 192.168.1.255)." },
+        { "q": "Wat is het verschil tussen Link State en Distance Vector routing?", "a": "Link State (OSPF): elke node kent volledige netwerkmap en berekent kortste pad. Distance Vector (BGP): nodes wisselen info uit met buren, kennen enkel beste volgende hop." },
+        { "q": "Wat is ICMP en waarvoor wordt het gebruikt?", "a": "Internet Control Message Protocol meldt fouten en statusinformatie, bv. destination unreachable, time exceeded. Wordt gebruikt door tools zoals ping en traceroute." },
+        { "q": "Hoe werkt IPv4 multicast direct routing?", "a": "Multicast IP-adres (224.0.0.0/4) wordt direct vertaald naar een multicast MAC-adres (01-00-5E-xx-xx-xx). Link layer accepteert meerdere MAC-adressen per interface." },
+        { "q": "Hoe werkt IPv4 multicast indirect routing?", "a": "Hosts schrijven zich in via IGMP. Routers bouwen een multicast distributieboom en verspreiden pakketten alleen naar netwerken met geïnteresseerde hosts. Scope wordt beperkt door TTL." },
+        { "q": "Noem drie verbeteringen van IPv6 t.o.v. IPv4.", "a": "128-bit adresruimte (onuitputtelijk), eenvoudiger header (40 bytes, geen checksum), geen ARP maar Neighbor Discovery (ICMPv6), geen broadcast (multicast in plaats daarvan)." },
+        { "q": "Geef drie voorbeelden van IPv6 speciale adressen.", "a": "::1 (loopback), fe80::/10 (link-local), fc00::/7 (unique local), ff00::/8 (multicast), 2000::/3 (global unicast)." },
+        { "q": "Wat is een link-local IPv6 adres en waarvoor wordt het gebruikt?", "a": "Automatisch toegekend adres in fe80::/10. Nodig voor communicatie binnen hetzelfde link-segment en voor Neighbor Discovery." },
+        { "q": "Wat is het doel van Neighbor Discovery Protocol (NDP) in IPv6?", "a": "Vervangt ARP, gebruikt ICMPv6 om IP-adressen naar MAC-adressen te mappen, router discovery, duplicate address detection, en multicast group management." }
+      ]
+    },
+        {
+      "id": "transport-layer",
+      "name": "Transport Layer",
+      "items": [
+        { "q": "Wat zijn de belangrijkste taken van de Transport Layer?", "a": "End-to-end communicatie, encapsulatie van applicatiedata, multiplexing/demultiplexing met poorten, betrouwbare dataoverdracht, en congestiecontrole." },
+        { "q": "Wat is het verschil tussen TCP en UDP?", "a": "TCP is connection-oriented, betrouwbaar, biedt volgorde en flow/congestiecontrole. UDP is connectionless, snel, weinig overhead, maar geen betrouwbaarheid of volgorde." },
+        { "q": "Wat is een socket en hoe wordt het geïdentificeerd?", "a": "Een socket is de binding van een transportprotocol met een poort. Bij TCP/UDP wordt een verbinding geïdentificeerd door een 4-tuple: [bron-IP, bronpoort, doel-IP, doelpoort]." },
+        { "q": "Noem enkele toepassingen die typisch UDP gebruiken.", "a": "DNS, VoIP, video/audio streaming, online gaming." },
+        { "q": "Noem enkele toepassingen die typisch TCP gebruiken.", "a": "HTTP(S), FTP, SMTP, IMAP, SSH." },
+        { "q": "Beschrijf kort de TCP-header velden.", "a": "Bevat bron- en doelpoort, sequentienummer, acknowledgmentnummer, headerlengte, flags (SYN, ACK, FIN), window size, checksum, urgent pointer en optioneel opties (MSS)." },
+        { "q": "Wat is het doel van sequentienummers en acknowledgements in TCP?", "a": "Sequentienummers nummeren bytes zodat de ontvanger volgorde kan herstellen. Acknowledgements bevestigen ontvangst en geven het volgende verwachte byte aan." },
+        { "q": "Wat is het verschil tussen stop-and-wait en sliding window?", "a": "Stop-and-wait: zender wacht op ACK na elk pakket, inefficiënt. Sliding window: meerdere pakketten mogen in-flight zijn voordat ACK’s terugkomen, veel efficiënter." },
+        { "q": "Hoe schat TCP de timeout voor hertransmissies in?", "a": "TCP meet Round-Trip Time (RTT), berekent een gewogen gemiddelde (EstimatedRTT), en zet de timeout op EstimatedRTT + 4 × standaarddeviatie." },
+        { "q": "Wat is de 3-way handshake en waarvoor dient het?", "a": "Setup-proces voor een TCP-verbinding: 1) SYN van client, 2) SYN-ACK van server, 3) ACK van client. Zorgt voor synchronisatie van sequentienummers en bevestiging dat beide kanten klaar zijn." },
+        { "q": "Wat is de 4-way handshake in TCP?", "a": "Het afsluiten van een TCP-verbinding: elke kant stuurt een FIN en ontvangt een ACK, in totaal 4 berichten." },
+        { "q": "Wat is flow control in TCP en hoe werkt het?", "a": "Mechanisme waarbij de ontvanger via het window size veld aangeeft hoeveel buffer er nog vrij is. Zender stuurt nooit meer data dan de ontvanger kan bufferen." },
+        { "q": "Wat is congestiecontrole en hoe detecteert TCP congestie?", "a": "Zender verlaagt snelheid bij congestie. Congestie wordt gedetecteerd via langere RTT’s, timeouts of duplicate ACK’s. ECN kan netwerk-assist geven." },
+        { "q": "Wat is 'slow start' in TCP?", "a": "Congestiecontrole-algoritme waarbij de congestion window exponentieel groeit vanaf 1 segment totdat congestie optreedt. Daarna schakelt TCP over naar lineaire groei (congestion avoidance)." },
+        { "q": "Hoe combineert TCP flow control en congestiecontrole?", "a": "Het effectieve verzendvenster = min(flow control window, congestion window)." },
+        { "q": "Wat is NAT en waarom wordt het gebruikt?", "a": "Network Address Translation vertaalt private IP-adressen naar een publiek adres, zodat meerdere hosts 1 publiek IPv4-adres kunnen delen. Opgelost tekort aan IPv4-adressen." },
+        { "q": "Wat is het verschil tussen NAT en PAT?", "a": "NAT vertaalt interne adressen naar externe adressen. PAT (Port Address Translation) vertaalt meerdere interne adressen naar 1 publiek IP met verschillende poortnummers." },
+        { "q": "Noem drie private IPv4-adresbereiken.", "a": "10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16." }
+      ]
+    },
+    {
+      "id": "wireless-networks",
+      "name": "Wireless Networks",
+      "items": [
+        { "q": "Wat is het verschil tussen een ad-hoc netwerk en een infrastructuur netwerk?", "a": "Ad-hoc: geen basisstation, directe communicatie tussen hosts (bv. Bluetooth, Wi-Fi Direct). Infrastructuur: communicatie via basisstation of AP, ondersteunt handoff (bv. Wi-Fi, GSM, 4G, 5G)." },
+        { "q": "Noem drie problemen die typisch zijn voor draadloze transmissie.", "a": "Afname van signaalsterkte met afstand, interferentie van andere bronnen (ruis, verborgen terminal), en multipath-propagatie." },
+        { "q": "Wat is de relatie tussen SNR, bit rate en bit error rate (BER)?", "a": "Hogere SNR → lagere BER. Bij eenzelfde SNR leidt een hogere bit rate tot hogere BER. Rate adaptation past modulatie aan de kanaalkwaliteit aan." },
+        { "q": "Wat is CSMA/CA en in welk protocol wordt het gebruikt?", "a": "Carrier Sense Multiple Access with Collision Avoidance. Gebruikt in Wi-Fi (802.11) om botsingen te vermijden door eerst kanaal te checken en RTS/CTS/ACK mechanismen te gebruiken." },
+        { "q": "Wat is een SSID en hoe associeert een client zich met een AP?", "a": "SSID = Service Set Identifier. Een AP adverteert via beacon frames, een client kan probe requests versturen en daarna associëren via authentication en association frames." },
+        { "q": "Beschrijf kort het 802.11 MAC frame.", "a": "Bevat Frame control, Duration (kanaalreservatie), 4x MAC-adressen, Sequence control, Payload (meestal IP-datagram), en CRC." },
+        { "q": "Wat is het doel van RTS/CTS/ACK in Wi-Fi?", "a": "RTS/CTS voorkomt botsingen door kanaalreservering en informeert verborgen stations. ACK bevestigt correcte ontvangst van het frame." },
+        { "q": "Hoe werkt handover tussen access points in Wi-Fi?", "a": "Client detecteert beter signaal, stuurt re-association request naar nieuwe AP. MAC-tabel wordt geüpdatet via IAPP. Sleutels kunnen via 802.11r/RADIUS uitgewisseld worden." },
+        { "q": "Hoe werkt power management in Wi-Fi?", "a": "Client kan slapen tussen beacon frames, AP buffert data en vermeldt dit in beacon. Client wordt kort wakker om data op te halen." },
+        { "q": "Wat zijn de frequentiebanden en kanalen voor Wi-Fi?", "a": "2.4 GHz band (13 kanalen in EU), 5 GHz band (~27 kanalen in EU). Beide backward compatible en MIMO mogelijk." },
+        { "q": "Welke frequentiebanden gebruikt 4G LTE en 5G?", "a": "4G: 800 MHz, 1.7 GHz, 2.6 GHz. 5G: 0.45–6 GHz en 25–52 GHz." },
+        { "q": "Wat is de rol van MME en HSS in 4G LTE?", "a": "MME: authenticatie, tunneling en mobiliteitsbeheer. HSS: database met IMSI en sleutels voor authenticatie." },
+        { "q": "Wat is de rol van de S-GW en P-GW in 4G LTE?", "a": "S-GW: eerste hop, tunnelt verkeer naar provider netwerk. P-GW: kent IP-adressen toe (NAT), fungeert als edge-router naar het internet." },
+        { "q": "Beschrijf kort het handover-proces in 4G LTE.", "a": "Bron-basisstation kiest target, reserveert resources, informeert mobiel toestel, forward tijdelijk verkeer. Daarna update MME en S-GW de tunnel, en verkeer gaat via nieuwe basisstation." }
+      ]
+    }
+    
+    ]
 }
 
   ]
 }
+
+
+
+
