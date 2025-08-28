@@ -456,8 +456,8 @@
   ]
 },
 {
-  "id": "sensors-actuators",
-  "name": "Sensoren & Actuatoren",
+  "id": "Communication-Networks",
+  "name": "Communication Networks",
   "chapters": [
       {
         "id": "introduction",
@@ -579,7 +579,7 @@
         { "q": "Beschrijf kort het handover-proces in 4G LTE.", "a": "Bron-basisstation kiest target, reserveert resources, informeert mobiel toestel, forward tijdelijk verkeer. Daarna update MME en S-GW de tunnel, en verkeer gaat via nieuwe basisstation." }
       ]
     }
-    
+
     ]
 }
 
