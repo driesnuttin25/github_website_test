@@ -40,45 +40,28 @@
   ===============================================================
   Flashcard Trainer – Single-file app for GitHub Pages
   ---------------------------------------------------------------
-  HOW TO USE
-  1) Put this file as index.html at the root of your GitHub Pages repo.
-  2) Create a file named `chapters.json` (same folder) that matches the schema below.
-  3) Commit & push. The app auto-loads your JSON. If not found, it falls back to SAMPLE_CHAPTERS.
+  NEW INPUT FORMAT (recommended): chapters.md
+  - Put a `chapters.md` file next to this index.html. The app will load it first.
+  - If chapters.md is missing, it falls back to chapters.json, then SAMPLE_CHAPTERS.
 
-  JSON SCHEMA (copy to chapters.json and fill in your own content):
-  {
-    "courses": [
-      {
-        "id": "comp-arch",
-        "name": "Computer Architecture",
-        "chapters": [
-          {
-            "id": "internal-memory",
-            "name": "Internal Memory",
-            "items": [
-              {"q": "Question text...", "a": "Answer text...", "img": "optional/path/to/image.png"}
-            ]
-          },
-          {
-            "id": "flash-ddr",
-            "name": "Flash & DDR",
-            "items": []
-          },
-          {
-            "id": "ssds",
-            "name": "How SSDs really work",
-            "items": []
-          }
-        ]
-      }
-    ]
-  }
+  chapters.md format example:
+
+  # Course: Computer Architecture [comp-arch]
+
+  ## Chapter: Internal Memory [internal-memory]
+
+  Q: What is a cache hit?
+  A: When the requested data is found in cache.
+
+  ---
+  IMG: images/cache.png
+  Q: Explain direct-mapped cache.
+  A: Each block maps to exactly one cache line.
 
   NOTES
-  - `img` is optional per item. If provided, it will be shown above the question.
-  - You can add more courses and chapters freely.
-  - You can include Markdown-like line breaks in q/a using \n; they will be rendered with <br>.
-  - All progress is stored in localStorage per chapter+mode (can be reset from UI).
+  - Course/chapter IDs in [brackets] are optional. If omitted, they are auto-slugified from the name.
+  - Cards are separated by `---`
+  - Q/A can be multi-line (just keep writing on next lines after Q: or A:)
   ===============================================================
   -->
 
@@ -111,10 +94,11 @@
     const $ = (sel, el=document) => el.querySelector(sel);
     const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
 
+    // IMPORTANT: include courseId in storage keys to prevent collisions
     const STORAGE_KEYS = {
       theme: 'trainer.theme',
-      progress: (chapterId, mode) => `trainer.progress.${chapterId}.${mode}`,
-      known:   (chapterId) => `trainer.known.${chapterId}` // for training persistence if desired
+      progress: (courseId, chapterId, mode) => `trainer.progress.${courseId}.${chapterId}.${mode}`,
+      known:   (courseId, chapterId) => `trainer.known.${courseId}.${chapterId}`
     };
 
     function setTheme(dark) {
@@ -128,12 +112,12 @@
 
     // Basic router state
     const State = {
-      data: null, // loaded JSON
+      data: null, // loaded content
       view: 'home',
       params: {},
     };
 
-    // Sample fallback data (empty chapters for you to fill later)
+    // Sample fallback data
     const SAMPLE_CHAPTERS = {
       courses: [
         {
@@ -148,7 +132,153 @@
       ]
     };
 
+    /*************************
+     * New: chapters.md parser
+     *************************/
+    function slugify(s='') {
+      return s.toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    }
+
+    function parseBracketId(line) {
+      const m = line.match(/\[([^\]]+)\]\s*$/);
+      return m ? m[1].trim() : null;
+    }
+
+    function stripBracketId(line) {
+      return line.replace(/\s*\[[^\]]+\]\s*$/, '').trim();
+    }
+
+    function parseChaptersMD(text) {
+      const lines = text.replace(/\r\n/g, '\n').split('\n');
+
+      const data = { courses: [] };
+      let course = null;
+      let chapter = null;
+
+      let cur = null;   // current card
+      let field = null; // "q" | "a" | "img"
+
+      function ensureCourse(name, idHint) {
+        const id = idHint || slugify(name);
+        let c = data.courses.find(x => x.id === id);
+        if (!c) {
+          c = { id, name, chapters: [] };
+          data.courses.push(c);
+        }
+        return c;
+      }
+
+      function ensureChapter(c, name, idHint) {
+        const id = idHint || slugify(name);
+        let ch = c.chapters.find(x => x.id === id);
+        if (!ch) {
+          ch = { id, name, items: [] };
+          c.chapters.push(ch);
+        }
+        return ch;
+      }
+
+      function flushCard() {
+        if (!chapter || !cur) return;
+        const q = (cur.q || '').trim();
+        const a = (cur.a || '').trim();
+        const img = (cur.img || '').trim();
+
+        if (q || a) {
+          chapter.items.push({ q, a, img: img || undefined });
+        }
+        cur = null;
+        field = null;
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const raw = lines[i];
+        const line = raw.trimEnd();
+        const t = line.trim();
+
+        // Empty line: keep as newline if we're mid Q/A
+        if (!t) {
+          if (cur && (field === 'q' || field === 'a')) cur[field] += '\n';
+          continue;
+        }
+
+        // Card separator
+        if (t === '---') {
+          flushCard();
+          continue;
+        }
+
+        // Course header
+        if (t.startsWith('# Course:')) {
+          flushCard();
+          const rest = t.replace('# Course:', '').trim();
+          const idHint = parseBracketId(rest);
+          const name = stripBracketId(rest);
+          course = ensureCourse(name || 'Untitled Course', idHint);
+          chapter = null;
+          continue;
+        }
+
+        // Chapter header
+        if (t.startsWith('## Chapter:')) {
+          flushCard();
+          if (!course) course = ensureCourse('Untitled Course', 'untitled-course');
+          const rest = t.replace('## Chapter:', '').trim();
+          const idHint = parseBracketId(rest);
+          const name = stripBracketId(rest);
+          chapter = ensureChapter(course, name || 'Untitled Chapter', idHint);
+          continue;
+        }
+
+        // Start a card if needed
+        if (!cur) cur = { q: '', a: '', img: '' };
+
+        // Fields
+        if (t.startsWith('Q:')) {
+          field = 'q';
+          cur.q += t.replace('Q:', '').trim() + '\n';
+          continue;
+        }
+        if (t.startsWith('A:')) {
+          field = 'a';
+          cur.a += t.replace('A:', '').trim() + '\n';
+          continue;
+        }
+        if (t.startsWith('IMG:')) {
+          field = 'img';
+          cur.img = t.replace('IMG:', '').trim();
+          continue;
+        }
+
+        // Continuation line
+        if (field === 'q' || field === 'a') {
+          cur[field] += line + '\n';
+        }
+      }
+
+      flushCard();
+      return data;
+    }
+
     async function loadData() {
+      // 1) Try chapters.md first
+      try {
+        const res = await fetch('chapters.md', { cache: 'no-store' });
+        if (res.ok) {
+          const text = await res.text();
+          const parsed = parseChaptersMD(text);
+          if (parsed && Array.isArray(parsed.courses) && parsed.courses.length) return parsed;
+          console.warn('chapters.md parsed but empty/invalid, falling back...');
+        }
+      } catch (e) {
+        console.warn('No chapters.md:', e.message);
+      }
+
+      // 2) Fallback to chapters.json
       try {
         const res = await fetch('chapters.json', { cache: 'no-store' });
         if (!res.ok) throw new Error('chapters.json not found');
@@ -257,7 +387,7 @@
             </div>
           </div>
         </div>
-        ${(chapter.items?.length || 0) === 0 ? `<p class='mt-6 text-amber-600 text-sm'>This chapter has no cards yet. Add them in <code>chapters.json</code>.</p>`: ''}
+        ${(chapter.items?.length || 0) === 0 ? `<p class='mt-6 text-amber-600 text-sm'>This chapter has no cards yet. Add them in <code>chapters.md</code> (recommended) or <code>chapters.json</code>.</p>`: ''}
       `;
     }
 
@@ -293,7 +423,7 @@
     }
 
     function createQuizSession({ course, chapter, items, mode, persist }) {
-      const key = STORAGE_KEYS.progress(chapter.id, mode);
+      const key = STORAGE_KEYS.progress(course.id, chapter.id, mode);
       const saved = JSON.parse(localStorage.getItem(key) || 'null');
 
       // Build initial queue
@@ -302,7 +432,7 @@
       // Known across sessions (optional)
       let knownPersisted = new Set();
       if (mode === 'training' && persist) {
-        const savedKnown = JSON.parse(localStorage.getItem(STORAGE_KEYS.known(chapter.id)) || '[]');
+        const savedKnown = JSON.parse(localStorage.getItem(STORAGE_KEYS.known(course.id, chapter.id)) || '[]');
         knownPersisted = new Set(savedKnown);
         if (knownPersisted.size) {
           queue = queue.filter(q => !knownPersisted.has(q.idx));
@@ -315,13 +445,12 @@
         courseId: course.id,
         chapterId: chapter.id,
         current: 0,
-        // Unique counters via sets (prevent double-count)
         correct: 0,
         wrong: 0,
-        knownOnce: [],         // array for persistence
+        knownOnce: [],
         unknownOnce: [],
         queue,
-        known: Array.from(knownPersisted), // persisted across sessions (training)
+        known: Array.from(knownPersisted),
         reveal: false,
       };
 
@@ -330,23 +459,20 @@
       let unknownOnceSet = new Set(state.unknownOnce || []);
 
       function persistState() {
-        // store arrays (not sets)
         state.knownOnce = Array.from(knownOnceSet);
         state.unknownOnce = Array.from(unknownOnceSet);
         localStorage.setItem(key, JSON.stringify({ itemsHash: hashItems(items), state }));
         if (mode === 'training' && persist) {
-          localStorage.setItem(STORAGE_KEYS.known(chapter.id), JSON.stringify(state.known));
+          localStorage.setItem(STORAGE_KEYS.known(course.id, chapter.id), JSON.stringify(state.known));
         }
       }
 
       function reset() {
         knownOnceSet.clear();
         unknownOnceSet.clear();
-        // Clear persisted state for this mode
         localStorage.removeItem(key);
-        // Also clear persisted-known if we are in training (fresh start)
         if (mode === 'training') {
-          localStorage.removeItem(STORAGE_KEYS.known(chapter.id));
+          localStorage.removeItem(STORAGE_KEYS.known(course.id, chapter.id));
         }
         state = {
           mode,
@@ -370,33 +496,26 @@
         const pos = state.current;
         const card = state.queue[pos];
 
-        // Unique counting logic
         if (knownFlag) {
           if (!knownOnceSet.has(card.idx)) {
             knownOnceSet.add(card.idx);
             state.correct = knownOnceSet.size;
           }
-          // If it was previously unknown, move it out of unknown set
           if (unknownOnceSet.delete(card.idx)) {
             state.wrong = unknownOnceSet.size;
           }
 
-          // TRAINING: mark as known and purge future occurrences
           if (state.mode === 'training') {
             if (!state.known.includes(card.idx)) state.known.push(card.idx);
-            // Remove current + any future duplicates of this idx
             state.queue = state.queue.filter((c, i) => !(c.idx === card.idx && i >= pos));
-            // current stays at same index to show next card
           } else {
             state.current++;
           }
         } else {
-          // Mark as unknown only once per unique card
           if (!unknownOnceSet.has(card.idx)) {
             unknownOnceSet.add(card.idx);
             state.wrong = unknownOnceSet.size;
           }
-          // TRAINING: reinsert after 4; ORDER: just advance
           if (state.mode === 'training') {
             const reinsertionOffset = 4;
             const insertPos = Math.min(pos + reinsertionOffset + 1, state.queue.length);
@@ -409,7 +528,6 @@
 
         state.reveal = false;
 
-        // Bounds check
         if (state.current >= state.queue.length) state.current = state.queue.length;
 
         persistState();
@@ -419,7 +537,6 @@
       function reveal() { state.reveal = !state.reveal; persistState(); renderQuiz(); }
 
       function uniqueSeenCount() {
-        // union size of knownOnce and unknownOnce
         return new Set([...knownOnceSet, ...unknownOnceSet]).size;
       }
 
@@ -436,12 +553,27 @@
       const seen = uniqueSeenCount();
       const remaining = total - quiz._sets.knownOnceSet.size;
 
-
       let content = '';
       if (!remaining && state.mode === 'training') {
-        content = `<div class=\"text-center py-10\">\n          <p class=\"text-5xl mb-3\">🎉</p>\n          <p class=\"text-lg font-semibold mb-1\">Training complete</p>\n          <p class=\"text-sm text-zinc-500 mb-6\">You marked all cards as known.</p>\n          <div class=\"flex items-center justify-center gap-2\">\n            <button class=\"px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700\" onclick=\"location.hash = '#/chapter/${course.id}/${chapter.id}'\">Back to chapter</button>\n            <button class=\"px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700\" onclick=\"quiz.reset()\">Reset</button>\n          </div>\n        </div>`;
+        content = `<div class="text-center py-10">
+          <p class="text-5xl mb-3">🎉</p>
+          <p class="text-lg font-semibold mb-1">Training complete</p>
+          <p class="text-sm text-zinc-500 mb-6">You marked all cards as known.</p>
+          <div class="flex items-center justify-center gap-2">
+            <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="location.hash = '#/chapter/${course.id}/${chapter.id}'">Back to chapter</button>
+            <button class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700" onclick="quiz.reset()">Reset</button>
+          </div>
+        </div>`;
       } else if (state.mode === 'order' && state.current >= state.queue.length) {
-        content = `<div class=\"text-center py-10\">\n          <p class=\"text-5xl mb-3\">✅</p>\n          <p class=\"text-lg font-semibold mb-1\">End of deck</p>\n          <p class=\"text-sm text-zinc-500 mb-4\">Score: <b>${state.correct}</b> known, <b>${state.wrong}</b> unknown</p>\n          <div class=\"flex items-center justify-center gap-2\">\n            <button class=\"px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700\" onclick=\"quiz.reset()\">Restart</button>\n            <button class=\"px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700\" onclick=\"location.hash = '#/chapter/${course.id}/${chapter.id}'\">Back</button>\n          </div>\n        </div>`;
+        content = `<div class="text-center py-10">
+          <p class="text-5xl mb-3">✅</p>
+          <p class="text-lg font-semibold mb-1">End of deck</p>
+          <p class="text-sm text-zinc-500 mb-4">Score: <b>${state.correct}</b> known, <b>${state.wrong}</b> unknown</p>
+          <div class="flex items-center justify-center gap-2">
+            <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="quiz.reset()">Restart</button>
+            <button class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700" onclick="location.hash = '#/chapter/${course.id}/${chapter.id}'">Back</button>
+          </div>
+        </div>`;
       } else {
         const card = state.queue[state.current];
         const q = card?.it?.q || '(No question)';
@@ -501,7 +633,6 @@
 
       $('#app').innerHTML = content;
 
-      // Wire up interactions
       const cardEl = $('#card');
       if (cardEl && swipedDirection) {
         cardEl.classList.add(swipedDirection === 'left' ? 'swipe-left' : 'swipe-right');
@@ -513,7 +644,6 @@
       $('#btnYes')?.addEventListener('click', () => quiz.mark(true));
       $('#btnReset')?.addEventListener('click', () => quiz.reset());
 
-      // Make clicking on the ANSWER toggle reveal on both touch and mouse, without triggering drag
       const ans = $('#answer');
       if (ans) {
         ans.addEventListener('click', (e) => { e.stopPropagation(); quiz.reveal(); });
@@ -521,7 +651,6 @@
         ans.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
       }
 
-      // Swipe handling with live preview
       if (cardEl) initSwipePreview(cardEl, {
         onLeft: () => quiz.mark(false, true),
         onRight: () => quiz.mark(true, true)
@@ -532,7 +661,7 @@
      * Router
      *************************/
     function route() {
-      const hash = location.hash.replace(/^#\/?/, ''); // remove leading #/
+      const hash = location.hash.replace(/^#\/?/, '');
       const parts = hash.split('/').filter(Boolean);
       if (!parts.length) { State.view = 'home'; State.params = {}; return renderHome(); }
 
@@ -551,7 +680,6 @@
     $('#homeBtn').addEventListener('click', () => location.hash = '#/');
     $('#darkToggle').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       if (e.key === 'h' || e.key === 'H') { location.hash = '#/'; }
       if (e.key === 't' || e.key === 'T') { setTheme(!document.documentElement.classList.contains('dark')); }
@@ -568,11 +696,11 @@
       const badgeL = el.querySelector('.badge-left');
       const badgeR = el.querySelector('.badge-right');
 
-      const commitThreshold = Math.max(60, window.innerWidth * 0.18); // ~18% of width
+      const commitThreshold = Math.max(60, window.innerWidth * 0.18);
 
       function setPreview(dx, dy) {
         const damp = Math.min(1, Math.abs(dx) / commitThreshold);
-        const rot = (dx / 20); // small rotation
+        const rot = (dx / 20);
         el.style.transform = `translateX(${dx}px) rotate(${rot}deg)`;
         el.classList.add('dragging');
 
@@ -607,7 +735,6 @@
         if (!dragging) return;
         const t = e.touches[0];
         const dx = t.clientX - startX; const dy = t.clientY - startY;
-        // Ignore mostly vertical drags
         if (Math.abs(dy) > Math.abs(dx) && Math.abs(dx) < 10) return;
         lastDX = dx;
         setPreview(dx, dy);
@@ -623,7 +750,7 @@
         }
       });
 
-      // Optional mouse support for desktop
+      // Mouse support
       let mouseDown = false;
       el.addEventListener('mousedown', (e) => { mouseDown = true; startX = e.clientX; startY = e.clientY; });
       document.addEventListener('mousemove', (e) => {
@@ -646,7 +773,7 @@
     function escapeHtml(str='') { return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s])); }
     function escapeAttr(str='') { return String(str).replace(/"/g, '&quot;'); }
     function shuffleArray(arr) { for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
-    function hashItems(items){ // cheap stable hash of q+a content
+    function hashItems(items){
       const s = items.map(it => `${it.q}|${it.a}|${it.img||''}`).join('\u0001');
       let h=0; for (let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return h;
     }
