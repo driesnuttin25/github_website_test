@@ -4,12 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Study Trainer</title>
+
   <!-- Tailwind via CDN (fine for GitHub Pages) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Tailwind config for dark mode
     tailwind.config = { darkMode: 'class' }
   </script>
+
   <style>
     /* Swipe feedback + animation */
     .swipe-left  { transform: translateX(-120%) rotate(-6deg); opacity: 0; transition: transform 220ms ease, opacity 220ms ease; }
@@ -35,14 +36,15 @@
     .badge-right { right: 12px; background: rgba(34,197,94,0.15); color: rgb(34,197,94); border: 1px solid rgba(34,197,94,0.35); }
   </style>
 </head>
+
 <body class="h-full bg-zinc-50 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50">
   <!--
   ===============================================================
   Flashcard Trainer – Single-file app for GitHub Pages
   ---------------------------------------------------------------
-  NEW INPUT FORMAT (recommended): chapters.md
-  - Put a `chapters.md` file next to this index.html. The app will load it first.
-  - If chapters.md is missing, it falls back to chapters.json, then SAMPLE_CHAPTERS.
+  INPUT: chapters.md (ONLY)
+  - Put a `chapters.md` file next to this index.html.
+  - If chapters.md is missing, it falls back to SAMPLE_CHAPTERS.
 
   chapters.md format example:
 
@@ -84,7 +86,7 @@
   </main>
 
   <footer class="max-w-5xl mx-auto px-4 py-10 text-center text-xs text-zinc-500">
-    <p>Built for quick studying. Swipe left = "Don’t know", right = "I know". Keyboard: ← / →, Space = reveal, H = home, T = theme.</p>
+    <p>Swipe left = "Don’t know", right = "I know". Keyboard: ← / →, Space = reveal, H = home, T = theme.</p>
   </footer>
 
   <script>
@@ -94,7 +96,6 @@
     const $ = (sel, el=document) => el.querySelector(sel);
     const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
 
-    // IMPORTANT: include courseId in storage keys to prevent collisions
     const STORAGE_KEYS = {
       theme: 'trainer.theme',
       progress: (courseId, chapterId, mode) => `trainer.progress.${courseId}.${chapterId}.${mode}`,
@@ -106,34 +107,37 @@
       if (dark) { root.classList.add('dark'); localStorage.setItem(STORAGE_KEYS.theme, 'dark'); }
       else { root.classList.remove('dark'); localStorage.setItem(STORAGE_KEYS.theme, 'light'); }
     }
-
-    // Theme init
     setTheme(localStorage.getItem(STORAGE_KEYS.theme) === 'dark');
 
-    // Basic router state
     const State = {
-      data: null, // loaded content
+      data: null,
       view: 'home',
-      params: {},
+      params: {}
     };
 
-    // Sample fallback data
+    let quiz = null;           // active quiz session object (only when in /quiz route)
+    window.quiz = null;        // for inline handlers (we set this when quiz is created)
+
     const SAMPLE_CHAPTERS = {
       courses: [
         {
-          id: 'comp-arch',
-          name: 'Computer Architecture',
+          id: 'sample-course',
+          name: 'Sample Course',
           chapters: [
-            { id: 'internal-memory', name: 'Internal Memory', items: [] },
-            { id: 'flash-ddr', name: 'Flash & DDR', items: [] },
-            { id: 'ssds', name: 'How SSDs really work', items: [] }
+            {
+              id: 'sample-chapter',
+              name: 'Sample Chapter',
+              items: [
+                { q: 'Add your own chapters in chapters.md', a: 'Put chapters.md next to index.html on GitHub Pages.' }
+              ]
+            }
           ]
         }
       ]
     };
 
     /*************************
-     * New: chapters.md parser
+     * chapters.md parser
      *************************/
     function slugify(s='') {
       return s.toLowerCase()
@@ -142,12 +146,10 @@
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
     }
-
     function parseBracketId(line) {
       const m = line.match(/\[([^\]]+)\]\s*$/);
       return m ? m[1].trim() : null;
     }
-
     function stripBracketId(line) {
       return line.replace(/\s*\[[^\]]+\]\s*$/, '').trim();
     }
@@ -187,10 +189,7 @@
         const q = (cur.q || '').trim();
         const a = (cur.a || '').trim();
         const img = (cur.img || '').trim();
-
-        if (q || a) {
-          chapter.items.push({ q, a, img: img || undefined });
-        }
+        if (q || a) chapter.items.push({ q, a, img: img || undefined });
         cur = null;
         field = null;
       }
@@ -200,19 +199,13 @@
         const line = raw.trimEnd();
         const t = line.trim();
 
-        // Empty line: keep as newline if we're mid Q/A
         if (!t) {
           if (cur && (field === 'q' || field === 'a')) cur[field] += '\n';
           continue;
         }
 
-        // Card separator
-        if (t === '---') {
-          flushCard();
-          continue;
-        }
+        if (t === '---') { flushCard(); continue; }
 
-        // Course header
         if (t.startsWith('# Course:')) {
           flushCard();
           const rest = t.replace('# Course:', '').trim();
@@ -223,7 +216,6 @@
           continue;
         }
 
-        // Chapter header
         if (t.startsWith('## Chapter:')) {
           flushCard();
           if (!course) course = ensureCourse('Untitled Course', 'untitled-course');
@@ -234,30 +226,13 @@
           continue;
         }
 
-        // Start a card if needed
         if (!cur) cur = { q: '', a: '', img: '' };
 
-        // Fields
-        if (t.startsWith('Q:')) {
-          field = 'q';
-          cur.q += t.replace('Q:', '').trim() + '\n';
-          continue;
-        }
-        if (t.startsWith('A:')) {
-          field = 'a';
-          cur.a += t.replace('A:', '').trim() + '\n';
-          continue;
-        }
-        if (t.startsWith('IMG:')) {
-          field = 'img';
-          cur.img = t.replace('IMG:', '').trim();
-          continue;
-        }
+        if (t.startsWith('Q:')) { field = 'q'; cur.q += t.replace('Q:', '').trim() + '\n'; continue; }
+        if (t.startsWith('A:')) { field = 'a'; cur.a += t.replace('A:', '').trim() + '\n'; continue; }
+        if (t.startsWith('IMG:')) { field = 'img'; cur.img = t.replace('IMG:', '').trim(); continue; }
 
-        // Continuation line
-        if (field === 'q' || field === 'a') {
-          cur[field] += line + '\n';
-        }
+        if (field === 'q' || field === 'a') cur[field] += line + '\n';
       }
 
       flushCard();
@@ -265,39 +240,40 @@
     }
 
     async function loadData() {
-      // 1) Try chapters.md first
       try {
         const res = await fetch('chapters.md', { cache: 'no-store' });
         if (res.ok) {
           const text = await res.text();
           const parsed = parseChaptersMD(text);
           if (parsed && Array.isArray(parsed.courses) && parsed.courses.length) return parsed;
-          console.warn('chapters.md parsed but empty/invalid, falling back...');
+          console.warn('chapters.md parsed but empty/invalid; using SAMPLE_CHAPTERS');
         }
       } catch (e) {
-        console.warn('No chapters.md:', e.message);
+        console.warn('No chapters.md; using SAMPLE_CHAPTERS. Reason:', e.message);
       }
-
-      // 2) Fallback to chapters.json
-      try {
-        const res = await fetch('chapters.json', { cache: 'no-store' });
-        if (!res.ok) throw new Error('chapters.json not found');
-        const json = await res.json();
-        if (!json || !Array.isArray(json.courses)) throw new Error('Invalid schema');
-        return json;
-      } catch (e) {
-        console.warn('Using SAMPLE_CHAPTERS fallback. Reason:', e.message);
-        return SAMPLE_CHAPTERS;
-      }
+      return SAMPLE_CHAPTERS;
     }
 
     /*************************
-     * Rendering helpers
+     * Data helpers
+     *************************/
+    function getCourseById(id) {
+      return (State.data?.courses || []).find(c => c.id === id);
+    }
+    function getChapterById(course, chapterId) {
+      return (course?.chapters || []).find(ch => ch.id === chapterId);
+    }
+
+    /*************************
+     * Rendering
      *************************/
     function renderHome() {
+      clearQuizIfLeavingQuiz();
+
       const courses = State.data.courses || [];
       const cards = courses.map(c => `
-        <button class="group rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 hover:shadow transition bg-white dark:bg-zinc-900" onclick="location.hash = '#/course/${c.id}'">
+        <button class="group rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 hover:shadow transition bg-white dark:bg-zinc-900"
+                onclick="location.hash = '#/course/${c.id}'">
           <div class="aspect-square rounded-xl bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-700 mb-3 flex items-center justify-center">
             <span class="text-3xl">📚</span>
           </div>
@@ -317,18 +293,15 @@
       `;
     }
 
-    function getCourseById(id) {
-      return State.data.courses.find(c => c.id === id);
-    }
-    function getChapterById(course, chapterId) {
-      return (course.chapters || []).find(ch => ch.id === chapterId);
-    }
-
     function renderCourse(courseId) {
+      clearQuizIfLeavingQuiz();
+
       const course = getCourseById(courseId);
       if (!course) return renderNotFound();
+
       const cards = (course.chapters || []).map(ch => `
-        <button class="group rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 hover:shadow transition bg-white dark:bg-zinc-900" onclick="location.hash = '#/chapter/${course.id}/${ch.id}'">
+        <button class="group rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 hover:shadow transition bg-white dark:bg-zinc-900"
+                onclick="location.hash = '#/chapter/${course.id}/${ch.id}'">
           <div class="aspect-square rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-800 dark:to-indigo-700 mb-3 flex items-center justify-center">
             <span class="text-3xl">🗂️</span>
           </div>
@@ -345,7 +318,8 @@
       $('#app').innerHTML = `
         <div class="flex items-center justify-between mb-4">
           <h1 class="text-2xl font-bold">${escapeHtml(course.name)}</h1>
-          <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" onclick="location.hash = '#/'">Home</button>
+          <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  onclick="location.hash = '#/'">Home</button>
         </div>
         <p class="text-zinc-500 mb-4">Pick a chapter.</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">${cards}</div>
@@ -353,6 +327,8 @@
     }
 
     function renderChapter(courseId, chapterId) {
+      clearQuizIfLeavingQuiz();
+
       const course = getCourseById(courseId);
       const chapter = course && getChapterById(course, chapterId);
       if (!chapter) return renderNotFound();
@@ -364,186 +340,257 @@
             <p class="text-zinc-500">${escapeHtml(course.name)}</p>
           </div>
           <div class="flex items-center gap-2">
-            <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" onclick="location.hash = '#/course/${course.id}'">Back</button>
-            <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" onclick="location.hash = '#/'">Home</button>
+            <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    onclick="location.hash = '#/course/${course.id}'">Back</button>
+            <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    onclick="location.hash = '#/'">Home</button>
           </div>
         </div>
+
         <div class="grid sm:grid-cols-2 gap-4">
           <div class="rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
             <h2 class="font-semibold mb-2">In Order</h2>
             <p class="text-sm text-zinc-500 mb-4">Go through all cards sequentially. Mark known/unknown and track your score.</p>
             <div class="flex items-center gap-2">
-              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="startQuiz('${course.id}','${chapter.id}','order')">Start</button>
-              <label class="inline-flex items-center gap-2 text-sm"><input id="shuffle-order" type="checkbox" class="rounded border-zinc-300"/> Shuffle</label>
+              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"
+                      onclick="startQuizFromChapter('${course.id}','${chapter.id}','order')">Start</button>
+              <label class="inline-flex items-center gap-2 text-sm">
+                <input id="shuffle-order" type="checkbox" class="rounded border-zinc-300"/>
+                Shuffle
+              </label>
             </div>
           </div>
+
           <div class="rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
             <h2 class="font-semibold mb-2">Training</h2>
             <p class="text-sm text-zinc-500 mb-4">Adaptive practice. Known cards disappear; unknown cards reappear after 4 others.</p>
             <div class="flex items-center gap-2">
-              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="startQuiz('${course.id}','${chapter.id}','training')">Start</button>
-              <label class="inline-flex items-center gap-2 text-sm"><input id="shuffle-training" type="checkbox" class="rounded border-zinc-300"/> Shuffle</label>
-              <label class="inline-flex items-center gap-2 text-sm"><input id="persist-training" type="checkbox" class="rounded border-zinc-300" checked/> Persist progress</label>
+              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"
+                      onclick="startQuizFromChapter('${course.id}','${chapter.id}','training')">Start</button>
+              <label class="inline-flex items-center gap-2 text-sm">
+                <input id="shuffle-training" type="checkbox" class="rounded border-zinc-300"/>
+                Shuffle
+              </label>
+              <label class="inline-flex items-center gap-2 text-sm">
+                <input id="persist-training" type="checkbox" class="rounded border-zinc-300" checked/>
+                Persist progress
+              </label>
             </div>
           </div>
         </div>
-        ${(chapter.items?.length || 0) === 0 ? `<p class='mt-6 text-amber-600 text-sm'>This chapter has no cards yet. Add them in <code>chapters.md</code> (recommended) or <code>chapters.json</code>.</p>`: ''}
+
+        ${(chapter.items?.length || 0) === 0
+          ? `<p class='mt-6 text-amber-600 text-sm'>This chapter has no cards yet. Add them in <code>chapters.md</code>.</p>`
+          : ''}
       `;
     }
 
     function renderNotFound() {
+      clearQuizIfLeavingQuiz();
       $('#app').innerHTML = `
         <div class="text-center py-16">
           <p class="text-5xl mb-2">🤔</p>
           <p class="text-lg">Not found.</p>
-          <button class="mt-4 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="location.hash = '#/'">Go Home</button>
+          <button class="mt-4 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"
+                  onclick="location.hash = '#/'">Go Home</button>
         </div>
       `;
     }
 
     /*************************
-     * Quiz Engine
+     * Quiz: route-based (fixes back/return)
      *************************/
-    let quiz = null; // active quiz session state
-
-    function startQuiz(courseId, chapterId, mode) {
-      const course = getCourseById(courseId);
-      const chapter = course && getChapterById(course, chapterId);
-      if (!chapter) return renderNotFound();
-
-      const items = Array.from(chapter.items || []);
+    function startQuizFromChapter(courseId, chapterId, mode) {
       const shuffle = mode === 'order' ? $('#shuffle-order')?.checked : $('#shuffle-training')?.checked;
       const persist = mode === 'training' ? $('#persist-training')?.checked : false;
+
+      // Put quiz in hash so browser back works properly
+      location.hash = `#/quiz/${courseId}/${chapterId}/${mode}?shuffle=${shuffle ? 1 : 0}&persist=${persist ? 1 : 0}`;
+    }
+
+    function parseQuery(qs) {
+      const q = {};
+      if (!qs) return q;
+      qs.replace(/^\?/, '').split('&').filter(Boolean).forEach(pair => {
+        const [k, v] = pair.split('=');
+        q[decodeURIComponent(k)] = decodeURIComponent(v || '');
+      });
+      return q;
+    }
+
+    function ensureQuiz(courseId, chapterId, mode, opts) {
+      const course = getCourseById(courseId);
+      const chapter = course && getChapterById(course, chapterId);
+      if (!chapter) { quiz = null; window.quiz = null; return renderNotFound(); }
+
+      const items = Array.from(chapter.items || []);
+      const shuffle = !!opts.shuffle;
+      const persist = (mode === 'training') ? !!opts.persist : false;
 
       if (shuffle) shuffleArray(items);
 
       quiz = createQuizSession({ course, chapter, items, mode, persist });
-      window.quiz = quiz; // expose so inline handlers always work
+      window.quiz = quiz;
+
       renderQuiz();
+    }
+
+    function clearQuizIfLeavingQuiz() {
+      // If we leave quiz route, keep things clean + prevent keydown actions
+      quiz = null;
+      window.quiz = null;
     }
 
     function createQuizSession({ course, chapter, items, mode, persist }) {
       const key = STORAGE_KEYS.progress(course.id, chapter.id, mode);
-      const saved = JSON.parse(localStorage.getItem(key) || 'null');
 
-      // Build initial queue
-      let queue = items.map((it, idx) => ({ idx, it }));
+      // load saved (only if item hash matches)
+      const savedWrap = safeJsonParse(localStorage.getItem(key));
+      const itemsHash = hashItems(items);
 
-      // Known across sessions (optional)
-      let knownPersisted = new Set();
+      // mastered (persisted training)
+      let mastered = new Set();
       if (mode === 'training' && persist) {
-        const savedKnown = JSON.parse(localStorage.getItem(STORAGE_KEYS.known(course.id, chapter.id)) || '[]');
-        knownPersisted = new Set(savedKnown);
-        if (knownPersisted.size) {
-          queue = queue.filter(q => !knownPersisted.has(q.idx));
-        }
+        const savedKnown = safeJsonParse(localStorage.getItem(STORAGE_KEYS.known(course.id, chapter.id))) || [];
+        mastered = new Set(Array.isArray(savedKnown) ? savedKnown : []);
       }
 
-      // Session state
-      let state = saved && saved.itemsHash === hashItems(items) ? saved.state : {
-        mode,
-        courseId: course.id,
-        chapterId: chapter.id,
-        current: 0,
-        correct: 0,
-        wrong: 0,
-        knownOnce: [],
-        unknownOnce: [],
-        queue,
-        known: Array.from(knownPersisted),
-        reveal: false,
-      };
+      // initial queue = all cards (minus mastered in training+persist)
+      let queue = items.map((it, idx) => ({ idx, it }));
+      if (mode === 'training' && persist && mastered.size) {
+        queue = queue.filter(c => !mastered.has(c.idx));
+      }
 
-      // Rebuild sets from arrays
-      let knownOnceSet = new Set(state.knownOnce || []);
-      let unknownOnceSet = new Set(state.unknownOnce || []);
+      // restore state if compatible
+      let state = (savedWrap && savedWrap.itemsHash === itemsHash && savedWrap.state)
+        ? savedWrap.state
+        : {
+            mode,
+            courseId: course.id,
+            chapterId: chapter.id,
+            current: 0,
+            reveal: false,
+            queue,
+            // unique wrong tracking (for score)
+            wrongOnce: [],
+            // training: store mastered indexes in array for persistence / UI
+            mastered: Array.from(mastered)
+          };
+
+      // rebuild sets
+      let wrongOnceSet = new Set(state.wrongOnce || []);
+      mastered = new Set(state.mastered || (Array.from(mastered)));
 
       function persistState() {
-        state.knownOnce = Array.from(knownOnceSet);
-        state.unknownOnce = Array.from(unknownOnceSet);
-        localStorage.setItem(key, JSON.stringify({ itemsHash: hashItems(items), state }));
+        state.wrongOnce = Array.from(wrongOnceSet);
+        state.mastered = Array.from(mastered);
+
+        localStorage.setItem(key, JSON.stringify({ itemsHash, state }));
         if (mode === 'training' && persist) {
-          localStorage.setItem(STORAGE_KEYS.known(course.id, chapter.id), JSON.stringify(state.known));
+          localStorage.setItem(STORAGE_KEYS.known(course.id, chapter.id), JSON.stringify(state.mastered));
         }
       }
 
       function reset() {
-        knownOnceSet.clear();
-        unknownOnceSet.clear();
         localStorage.removeItem(key);
         if (mode === 'training') {
           localStorage.removeItem(STORAGE_KEYS.known(course.id, chapter.id));
         }
+
+        wrongOnceSet.clear();
+        mastered.clear();
+
         state = {
           mode,
           courseId: course.id,
           chapterId: chapter.id,
           current: 0,
-          correct: 0,
-          wrong: 0,
-          knownOnce: [],
-          unknownOnce: [],
-          queue: items.map((it, idx) => ({ idx, it })),
-          known: [],
           reveal: false,
+          queue: items.map((it, idx) => ({ idx, it })),
+          wrongOnce: [],
+          mastered: []
         };
+
         persistState();
         renderQuiz();
       }
 
+      function getTotals() {
+        const total = items.length;
+
+        // In training: progress should ONLY reflect mastered, not "seen"
+        const masteredCount = (mode === 'training') ? mastered.size : null;
+
+        // In order: progress can be "seen so far"
+        const seenCount = (mode === 'order') ? Math.min(state.current, state.queue.length) : null;
+
+        return { total, masteredCount, seenCount };
+      }
+
       function mark(knownFlag, viaSwipe=false) {
         if (!state.queue.length) return;
-        const pos = state.current;
+
+        const pos = Math.max(0, Math.min(state.current, state.queue.length - 1));
         const card = state.queue[pos];
+        if (!card) return;
 
         if (knownFlag) {
-          if (!knownOnceSet.has(card.idx)) {
-            knownOnceSet.add(card.idx);
-            state.correct = knownOnceSet.size;
-          }
-          if (unknownOnceSet.delete(card.idx)) {
-            state.wrong = unknownOnceSet.size;
-          }
+          if (mode === 'training') {
+            // mark mastered
+            mastered.add(card.idx);
 
-          if (state.mode === 'training') {
-            if (!state.known.includes(card.idx)) state.known.push(card.idx);
-            state.queue = state.queue.filter((c, i) => !(c.idx === card.idx && i >= pos));
+            // remove ALL occurrences of this card from queue
+            state.queue = state.queue.filter(c => c.idx !== card.idx);
+
+            // keep current pointing at next card at same position
+            if (pos >= state.queue.length) state.current = state.queue.length; else state.current = pos;
           } else {
-            state.current++;
+            // order mode just advance
+            state.current = pos + 1;
           }
         } else {
-          if (!unknownOnceSet.has(card.idx)) {
-            unknownOnceSet.add(card.idx);
-            state.wrong = unknownOnceSet.size;
-          }
-          if (state.mode === 'training') {
-            const reinsertionOffset = 4;
-            const insertPos = Math.min(pos + reinsertionOffset + 1, state.queue.length);
-            state.queue.splice(insertPos, 0, { idx: card.idx, it: card.it });
-            state.current++;
+          // mark wrong (unique)
+          wrongOnceSet.add(card.idx);
+
+          if (mode === 'training') {
+            // remove current occurrence and reinsert after 4 others
+            state.queue.splice(pos, 1);
+            const offset = 4;
+            const insertPos = Math.min(pos + offset, state.queue.length);
+            state.queue.splice(insertPos, 0, card);
+
+            // move to next card (same index pos, now points to next item)
+            if (pos >= state.queue.length) state.current = state.queue.length; else state.current = pos;
           } else {
-            state.current++;
+            state.current = pos + 1;
           }
         }
 
         state.reveal = false;
-
-        if (state.current >= state.queue.length) state.current = state.queue.length;
+        if (state.current < 0) state.current = 0;
+        if (state.current > state.queue.length) state.current = state.queue.length;
 
         persistState();
         renderQuiz(knownFlag ? (viaSwipe ? 'right' : null) : (viaSwipe ? 'left' : null));
       }
 
-      function reveal() { state.reveal = !state.reveal; persistState(); renderQuiz(); }
-
-      function uniqueSeenCount() {
-        return new Set([...knownOnceSet, ...unknownOnceSet]).size;
+      function reveal() {
+        state.reveal = !state.reveal;
+        persistState();
+        renderQuiz();
       }
 
-      return { state, reveal, reset, mark, persistState, uniqueSeenCount,
-               _sets: { knownOnceSet, unknownOnceSet } };
+      return {
+        state,
+        mark,
+        reveal,
+        reset,
+        persistState,
+        getTotals,
+        _sets: { wrongOnceSet, mastered }
+      };
     }
-
+    
     function renderQuiz(swipedDirection = null) {
       const { state, uniqueSeenCount } = quiz;
       const course = getCourseById(state.courseId);
