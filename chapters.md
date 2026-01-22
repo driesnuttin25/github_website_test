@@ -1,152 +1,239 @@
-# Course: Computer Graphics (YI1449) [cg-yi1449]
+# Course: Computer Graphics [computer-graphics]
 
-## Chapter: Intro & Why Computer Graphics [cg-intro]
+## Chapter: Introductie Computer Graphics [cg-intro]
 
-Q: Give a concise definition of “computer graphics”.
-A: Computer graphics is the science and art of communicating visually via a computer display and its interaction devices.
-
----
-Q: Why does computer graphics still matter now that Generative AI exists?
-A: Because CG gives control over what is shown, can visualize “real” data, integrates into 3D environments, and is also used “just for fun”.
+Q: Wat is computer graphics?
+A: Computer graphics is de wetenschap en kunst van visuele communicatie via een computerdisplay en interactieapparaten.
 
 ---
-Q: Name 3 application areas of computer graphics shown in the intro.
-A: Examples include plots/graphs (data visualization), CAD, virtual reality, art/entertainment, image processing, and graphical user interfaces.
+Q: Wat zijn de belangrijkste doelen van computer graphics?
+A:
+- Visuele communicatie
+- Visualisatie van data
+- Interactie met de gebruiker
+- Opbouw van virtuele omgevingen
 
 ---
-Q: What are the two big parts in the course evaluation (theory vs practica) and roughly their weights?
-A: Theory is the larger part (about 65%) and practica is about 35%.
+Q: Waarom is computer graphics nog relevant ondanks generative AI?
+A:
+- Volledige controle over wat er getoond wordt
+- Visualisatie van “echte” en meetbare data
+- Integratie in interactieve 3D-omgevingen
+- Reproduceerbare en deterministische resultaten
 
 ---
-
-## Chapter: History Timeline [cg-history]
-
-Q: Name two early computer graphics milestones from the 1950s.
-A: Early graphical displays using an oscilloscope; early videogame “Tennis for Two”; and early drawing program “Sketchpad”.
-
----
-Q: When was the term “Computer Graphics” first used, and by whom (as shown in the slides)?
-A: Around 1960, by William Fetter at Boeing.
-
----
-Q: Give two notable developments from the 1960s listed in the slides.
-A: Spacewar videogame; Bézier curves; early computer animation film; HMD (head-mounted display).
+Q: Noem belangrijke mijlpalen uit de vroege geschiedenis van computer graphics (jaren 1950–1960).
+A:
+- Grafische weergaven met oscilloscopen
+- Eerste videospel: *Tennis for Two*
+- Tekenprogramma *Sketchpad*
+- Eerste gebruik van de term “Computer Graphics” (William Fetter, Boeing)
+- Bézier-curves
+- Eerste computeranimatiefilms
+- Head-Mounted Displays (HMD)
 
 ---
-Q: What is SIGGRAPH and when does it appear in the timeline?
-A: ACM SIGGRAPH is a major computer graphics conference; the slides mention 1969.
+Q: Wat was de rol van de University of Utah in de ontwikkeling van computer graphics?
+A:
+- Onderzoeksgroep rond Ivan Sutherland en David C. Evans
+- Ontwikkeling van fundamentele 3D-concepten
+- Bijdragen aan ray tracing (Arthur Appel)
 
 ---
-Q: Name two events/tech milestones listed for the 1990s–2000s era.
-A: 1992 OpenGL; 1999 Nvidia GeForce 256; 2006 OpenGL taken over by Khronos Group; plus later: OpenGL ES, motion capture, GPGPU, physically based rendering, Vulkan/Metal.
+Q: Wat is SIGGRAPH en waarom is het belangrijk?
+A: SIGGRAPH is een ACM-conferentie (sinds 1969) die een centrale rol speelt in onderzoek en ontwikkeling binnen computer graphics.
 
 ---
-
-## Chapter: Graphics Pipeline [cg-pipeline]
-
-Q: What is the “graphics pipeline” in one sentence?
-A: It’s the sequence of steps that converts scene/geometry data into pixels in the frame buffer shown on screen.
-
----
-Q: In a classic pipeline view, what happens after primitive assembly?
-A: Rasterization converts primitives into fragments/pixels, followed by per-fragment operations, ending in the frame buffer.
+Q: Welke technologische evoluties kwamen op vanaf de jaren 1980?
+A:
+- Opkomst van PC’s, CPU’s en GPU’s
+- Shaders
+- Silicon Graphics workstations
+- Videogames en realtime rendering
+- Chroma keying
 
 ---
-Q: What is “rasterization”?
-A: The step that maps geometric primitives (triangles/lines) into screen-space fragments/pixels to be colored.
+Q: Welke belangrijke graphics-API’s en technologieën ontstonden later?
+A:
+- OpenGL (1992)
+- Nvidia GeForce 256 (1999)
+- OpenGL ES
+- GPGPU
+- Physically Based Rendering (PBR)
+- Vulkan en Metal
 
 ---
-
-## Chapter: OpenGL Basics [cg-opengl]
-
-Q: In OpenGL naming conventions, what does the prefix “gl” indicate?
-A: It indicates core OpenGL functions (e.g., glBegin()).
+Q: Wat is de grafische pijplijn (graphics pipeline)?
+A: Een reeks stappen die geometrische data omzet naar pixels op het scherm, van vertices tot fragmenten in de framebuffer.
 
 ---
-Q: What are GLU and GLUT and what are their common prefixes?
-A: GLU is the OpenGL Utility library (prefix glu); GLUT is the OpenGL Utility Toolkit (prefix glut).
+Q: Geef voorbeelden van toepassingen van computer graphics.
+A:
+- Grafieken en datavisualisatie
+- CAD (Computer-Aided Design)
+- Virtuele en augmented realiteit
+- Kunst, animatie en videogames
+- Beeldverwerking
+- Grafische gebruikersinterfaces (GUI’s)
+
+
+
+
+## Chapter: Interactie en Geometrische Primitieven [cg-interactie-primitieven]
+
+Q: Welke drie grote onderdelen komen aan bod in dit hoofdstuk?
+A:
+- Interactie (invoer)
+- Animatie
+- Geometrische primitieven
 
 ---
-Q: Give an example of an OpenGL symbolic constant and an OpenGL datatype mentioned in the intro.
-A: Example constant: GL_COLOR_RGB. Example datatype: GLfloat.
+Q: Wat is een attribute-variabele in GLSL?
+A: Een attribute-variabele bevat per-vertex data (zoals positie) en wordt gebruikt in de vertex shader.
 
 ---
-Q: Which include is often sufficient because it already includes gl.h and glu.h (as stated in the slides)?
-A: Including GLUT (glut.h) is often sufficient because it includes gl.h and glu.h.
+Q: Wat is een uniform-variabele in GLSL?
+A: Een uniform-variabele is een globale variabele die dezelfde waarde heeft voor alle vertices en fragments.
 
 ---
-Q: In the “Hello OpenGL” example, what does setting GL_PROJECTION and calling gluOrtho2D() do?
-A: It sets up a 2D orthographic projection (a 2D coordinate system mapping to the window).
+Q: Wat is het verschil tussen attribute en uniform variabelen?
+A:
+- Attribute: per vertex verschillend
+- Uniform: voor alle vertices gelijk
+- Attribute → typisch positie, normaalvector
+- Uniform → typisch kleur, transformaties
 
 ---
-Q: In the simple line example, what do glBegin(GL_LINES) and glEnd() represent conceptually?
-A: They define the start and end of a primitive specification block; vertices between them form line primitives.
+Q: Hoe geef je een attribute-variabele door van JavaScript naar de vertex shader?
+A:
+1. Attribuut declareren in shader
+2. Locatie opvragen met `gl.getAttribLocation`
+3. Waarde instellen met `gl.vertexAttrib*f`
 
 ---
-
-## Chapter: HTML5 Canvas (2D) [cg-canvas]
-
-Q: What is the HTML <canvas> tag used for?
-A: It defines a bitmap drawing area in an HTML page that you can draw into using JavaScript.
-
----
-Q: How do you get the 2D drawing context from a canvas element?
-A: Get the element by id, then call getContext("2d"), e.g. const ctx = canvas.getContext("2d").
+Q: Welke functies bestaan er om attribute-waarden door te geven?
+A:
+- `gl.vertexAttrib1f`
+- `gl.vertexAttrib2f`
+- `gl.vertexAttrib3f`
+- `gl.vertexAttrib4f`
+- Vectorversies: `gl.vertexAttrib*fv`
 
 ---
-Q: What are some basic 2D canvas drawing methods shown?
-A: fillRect(x,y,w,h), setting fillStyle, beginPath/moveTo/lineTo/stroke(), fillText(), strokeText().
+Q: Hoe wordt een uniform-variabele doorgegeven van JavaScript naar de shader?
+A:
+1. Uniform declareren in shader
+2. Locatie opvragen met `gl.getUniformLocation`
+3. Waarde instellen met `gl.uniform*f`
 
 ---
-Q: What does “context is case sensitive” mean in practice?
-A: You must use the exact string like "2d" or "webgl" with correct casing, otherwise you won’t get the intended context.
+Q: Welke functies bestaan er om uniform-waarden door te geven?
+A:
+- `gl.uniform1f`
+- `gl.uniform2f`
+- `gl.uniform3f`
+- `gl.uniform4f`
 
 ---
-
-## Chapter: WebGL Intro [cg-webgl]
-
-Q: What is WebGL and what is it based on (as stated in the slides)?
-A: WebGL is a browser graphics API integrated in HTML5 and based on OpenGL ES 2.0, using a shader-based pipeline.
-
----
-Q: How do you get a WebGL rendering context from a canvas?
-A: const gl = canvas.getContext("webgl").
+Q: Wat betekent de naamgeving van WebGL-functies zoals gl.vertexAttrib3fv?
+A:
+- 3 → aantal componenten
+- f → float
+- v → vector als argument
 
 ---
-Q: In the simplest WebGL “clear” demo, what do gl.clearColor(...) and gl.clear(gl.COLOR_BUFFER_BIT) do?
-A: They set the clear color and then clear the color buffer to that color.
+Q: Wat is een event handler?
+A: Een functie die bepaalt wat er gebeurt wanneer een specifieke gebeurtenis (event) plaatsvindt.
 
 ---
-
-## Chapter: Shaders & GLSL [cg-shaders]
-
-Q: Why do you need shaders for “real graphics” in WebGL (as introduced)?
-A: Because WebGL uses a shader-based pipeline; you need at least a vertex shader and fragment shader to render.
+Q: Wat is een callback-functie?
+A: Een functie die automatisch wordt aangeroepen wanneer een event optreedt.
 
 ---
-Q: What does a vertex shader do vs a fragment shader?
-A: Vertex shader determines what happens to vertices (positions, transforms, per-vertex outputs). Fragment shader determines pixel (fragment) colors.
+Q: Geef voorbeelden van invoer-events in WebGL.
+A:
+- `document.onkeydown`
+- `canvas.onmousedown`
+- `canvas.onmouseup`
+- `canvas.onmousemove`
 
 ---
-Q: What language are WebGL shaders written in?
-A: GLSL (GL Shader Language).
+Q: Waarom worden vaak anonieme functies gebruikt bij event handlers?
+A: Om extra parameters door te geven zonder globale variabelen te gebruiken.
 
 ---
-Q: In the shown minimal vertex shader, what are gl_Position and gl_PointSize used for?
-A: gl_Position sets the clip-space position of the vertex; gl_PointSize sets the size of points when drawing points.
+Q: Waarom is coördinatenconversie nodig bij muisklikken?
+A:
+- Muisevents werken in pixelcoördinaten
+- WebGL gebruikt genormaliseerde coördinaten tussen -1 en 1
+- Conversie is nodig om correcte posities te bekomen
 
 ---
-Q: In the shown minimal fragment shader, what does gl_FragColor represent?
-A: The final RGBA color output for the fragment/pixel.
+Q: Wat zijn genormaliseerde WebGL-coördinaten?
+A:
+- x en y liggen tussen -1 en 1
+- (0,0) ligt in het midden van het canvas
 
 ---
-Q: List the core steps to use shaders in WebGL as shown in the pipeline demo code.
-A: Create program → create vertex/fragment shaders → set shader sources → compile shaders → attach to program → link program → use program → draw.
+Q: Wat is animatie in computer graphics?
+A: Het tonen van opeenvolgende beelden in de tijd om beweging te simuleren.
 
 ---
-Q: What is the difference between attribute variables and uniform variables?
-A: Attributes provide per-vertex inputs (can differ per vertex). Uniforms are global inputs constant for all vertices/fragments in a draw call.
+Q: Welke functie wordt gebruikt voor animaties in WebGL?
+A: `requestAnimationFrame()`
 
 ---
-Q: How do you typically set a constant attribute value for a shader attribute (as shown)?
-A: Get the attribute location with getAttribLocation, then set it with something like vertexAttrib3f(location, x, y, z).
+Q: Waarom is requestAnimationFrame beter dan setInterval?
+A:
+- Gesynchroniseerd met schermverversing
+- Efficiënter
+- Minder CPU-belasting
+
+---
+Q: Hoe wordt tijdsafhankelijke animatie gerealiseerd?
+A:
+- Tijd meten met `Date.now()`
+- Rotatie/verplaatsing schalen met verstreken tijd
+- Onafhankelijk van framerate
+
+---
+Q: Wat zijn geometrische primitieven?
+A: De basisvormen waaruit alle geometrie is opgebouwd.
+
+---
+Q: Waarom zijn buffer objects nodig?
+A: Om meerdere vertices efficiënt van JavaScript naar de GPU te sturen.
+
+---
+Q: Wat is een buffer object?
+A: Een geheugenbuffer op de GPU waarin vertexdata wordt opgeslagen.
+
+---
+Q: Geef de vijf stappen om een buffer object te gebruiken.
+A:
+1. Buffer object aanmaken (`gl.createBuffer`)
+2. Buffer binden (`gl.bindBuffer`)
+3. Data schrijven (`gl.bufferData`)
+4. Buffer koppelen aan attribute (`gl.vertexAttribPointer`)
+5. Attribute activeren (`gl.enableVertexAttribArray`)
+
+---
+Q: Welke functie wordt gebruikt om te tekenen met buffer objects?
+A: `gl.drawArrays()`
+
+---
+Q: Welke tekenmodi ondersteunt gl.drawArrays?
+A:
+- `gl.POINTS`
+- `gl.LINES`
+- `gl.LINE_STRIP`
+- `gl.LINE_LOOP`
+- `gl.TRIANGLES`
+- `gl.TRIANGLE_STRIP`
+- `gl.TRIANGLE_FAN`
+
+---
+Q: Wat is het verschil tussen gl.TRIANGLES en gl.TRIANGLE_STRIP?
+A:
+- TRIANGLES: elke 3 vertices vormen een losse driehoek
+- TRIANGLE_STRIP: elke nieuwe vertex vormt een nieuwe driehoek met de vorige twee
