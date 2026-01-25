@@ -1834,3 +1834,594 @@ Procedural modeling is het genereren van geometrie via algoritmen in plaats van 
 Q: Wat is image-based lighting (IBL)?
 A:
 Image-based lighting gebruikt een omgevingstekstuur (environment map) als lichtbron om realistische globale belichting en reflecties te simuleren.
+
+
+
+
+# Course: Ingenieur en Economie [ingenieur-economie]
+
+## Chapter: Jaarrekening & Analyse [jaarrekening]
+
+Q: Wat is de jaarrekening en uit welke drie delen bestaat ze?
+A:
+De jaarrekening is het geheel aan financiële rapporten dat een onderneming opstelt om haar financiële situatie en prestaties te communiceren. Ze bestaat uit:
+- **De balans**: een “foto” van de financiële positie op een bepaald moment
+- **De resultatenrekening**: een “film” van kosten en opbrengsten over een periode
+- **De toelichting**: extra achtergrond en detailinformatie die de cijfers in balans en resultatenrekening verduidelijkt
+
+---
+Q: Leg het verschil uit tussen de balans en de resultatenrekening met de analogie “foto” vs “film”.
+A:
+De **balans** is een momentopname (“foto”): ze toont wat de onderneming bezit en verschuldigd is op één specifiek tijdstip (bv. 31/12). De **resultatenrekening** is een periodeoverzicht (“film”): ze toont hoe de onderneming tijdens een periode (bv. boekjaar) tot winst of verlies kwam via opbrengsten en kosten. Daardoor kan je uit de balans alleen niet afleiden hoe het resultaat precies is samengesteld; daarvoor heb je de resultatenrekening nodig.
+
+---
+Q: Wat betekent het principe van “dubbel boekhouden” en waarom blijft de balans daardoor in evenwicht?
+A:
+Dubbel boekhouden betekent dat elke transactie **twee** effecten heeft (debet/credit), waardoor de boekhouding intern consistent blijft. In balans-termen blijft altijd gelden: **Totaal Actief = Totaal Passief**. Elke wijziging aan de ene kant heeft een overeenkomstige wijziging aan de andere kant (of een herschikking binnen dezelfde kant), zodat het evenwicht behouden blijft.
+
+---
+Q: Welke vier basistypes van balansimpact kan één transactie hebben?
+A:
+Binnen de context van de balans is de mogelijke impact van een transactie vierledig:
+- **Actief stijgt & passief stijgt** (bv. lening ontvangen op bankrekening)
+- **Actief stijgt & actief daalt** (bv. cash afhalen van bank: bank daalt, kas stijgt)
+- **Passief stijgt & passief daalt** (bv. herfinanciering: kort schuld daalt, lang schuld stijgt)
+- **Actief daalt & passief daalt** (bv. lening terugbetalen: bank daalt, schuld daalt)
+
+---
+Q: Wat zijn stakeholders en waarom is accounting voor hen relevant?
+A:
+Stakeholders zijn alle partijen die belang hebben bij de onderneming (bv. aandeelhouders, banken, leveranciers, personeel, overheid, klanten). Accounting is relevant omdat het systematisch informatie verzamelt en rapporteert zodat stakeholders onderbouwde beslissingen kunnen nemen, zoals: investeren, krediet verlenen, leveren op krediet, fiscale controle, enz.
+
+---
+Q: Definieer “accounting” in examengerichte termen.
+A:
+Accounting is het **systematisch verzamelen, verwerken, analyseren, samenvatten en rapporteren** van informatie over transacties en gebeurtenissen in ondernemingen, met als doel relevante informatie te verschaffen aan interne (management) en externe (stakeholders) gebruikers.
+
+---
+Q: Wat is het entiteitsprincipe en welke praktische implicatie heeft dit?
+A:
+Het entiteitsprincipe stelt dat de onderneming als een **afzonderlijke entiteit** wordt beschouwd, gescheiden van haar eigenaars. Praktisch betekent dit dat privétransacties van eigenaars niet vermengd mogen worden met ondernemingskosten/-opbrengsten; enkel transacties die tot de onderneming behoren komen in de boekhouding en jaarrekening.
+
+---
+Q: Wat is het toerekeningsprincipe (accrual accounting) en waarom is het cruciaal?
+A:
+Het toerekeningsprincipe zegt dat kosten en opbrengsten worden toegewezen aan de **periode waarop ze betrekking hebben**, onafhankelijk van het tijdstip van betaling/ontvangst. Het is cruciaal omdat het een realistischer beeld geeft van prestaties per periode en de basis vormt voor correcte winstbepaling.
+
+---
+Q: Wat is het realisatieprincipe?
+A:
+Het realisatieprincipe bepaalt dat opbrengsten worden erkend wanneer ze **gerealiseerd** zijn (de prestatie is geleverd) en wanneer inning voldoende zeker is, niet noodzakelijk wanneer cash ontvangen wordt. Dit voorkomt dat opbrengsten te vroeg of te laat in het resultaat worden opgenomen.
+
+---
+Q: Wat is het overeenstemmingsprincipe (matching) en hoe hangt het samen met winstbepaling?
+A:
+Het matchingprincipe stelt dat kosten zoveel mogelijk in dezelfde periode worden opgenomen als de opbrengsten die ze helpen realiseren. Hierdoor wordt winst per periode correct berekend als een “match” tussen gerealiseerde prestaties en de middelen die daarvoor verbruikt werden.
+
+---
+Q: Leg het verschil uit tussen opbrengsten, kosten, ontvangsten en uitgaven.
+A:
+- **Opbrengsten**: gerealiseerde prestaties in een periode (boekhoudkundig), los van cash-inning  
+- **Kosten**: verbruikte middelen om opbrengsten te realiseren (boekhoudkundig), los van cash-betaling  
+- **Ontvangsten**: effectief ontvangen cash in een periode  
+- **Uitgaven**: effectief betaalde cash in een periode  
+Belangrijk: **opbrengst ≠ ontvangst** en **kost ≠ uitgave** door timingverschillen en accruals.
+
+---
+Q: Wat is de algemene structuur van de balans (actief- en passiefzijde) en volgens welk principe worden posten gerangschikt?
+A:
+De balans bestaat uit:
+- **Actief (aanwendingen van vermogen)**: bezittingen en rechten van de onderneming  
+  Posten worden in beginsel gerangschikt volgens **toenemende liquiditeit** (hoe snel omzetbaar in geld).
+- **Passief (bronnen van vermogen)**: eigen vermogen + schulden  
+  Posten worden in beginsel gerangschikt volgens **toenemende opeisbaarheid** (hoe snel moet het betaald worden).
+
+---
+Q: Geef typische voorbeelden van posten aan de actiefzijde (met hoofdgroepen).
+A:
+- **Vaste activa**: immateriële vaste activa, materiële vaste activa (terreinen/gebouwen, machines, meubilair/rollend materieel), financiële vaste activa  
+- **Vlottende activa**: voorraden (grondstoffen, goederen in bewerking, gereed product, handelsgoederen), vorderingen ≤ 1 jaar, geldbeleggingen, liquide middelen, overlopende rekeningen (actief)
+
+---
+Q: Geef typische voorbeelden van posten aan de passiefzijde (met hoofdgroepen).
+A:
+- **Eigen vermogen**: inbreng/kapitaal, reserves, overgedragen winst/verlies  
+- **Schulden**: schulden > 1 jaar, schulden ≤ 1 jaar (handelsschulden, financiële schulden, schulden m.b.t. belastingen/bezoldigingen/sociale lasten), overlopende rekeningen (passief)
+
+---
+Q: Wat is de algemene structuur van de resultatenrekening (in logische volgorde)?
+A:
+De resultatenrekening bouwt het resultaat op in stappen:
+1. **Bedrijfsopbrengsten** (o.a. omzet, andere bedrijfsopbrengsten)
+2. **Bedrijfskosten** (o.a. aankopen/handelsgoederen, diensten & diverse goederen, bezoldigingen, afschrijvingen/voorzieningen, andere kosten)
+→ **Bedrijfsresultaat**
+3. **Financiële opbrengsten en kosten**
+→ **Resultaat voor belasting**
+4. **Belastingen op het resultaat**
+→ **Resultaat van het boekjaar**
+
+---
+Q: Waarom kan je winst/verlies niet “gewoon rechtstreeks” in de balans plaatsen zonder resultatenrekening?
+A:
+De balans is een momentopname en toont niet hoe het resultaat is samengesteld. Zonder resultatenrekening ontbreekt inzicht in welke opbrengsten en kosten het resultaat hebben veroorzaakt. De resultatenrekening is noodzakelijk om het resultaat over een periode te verklaren en te analyseren.
+
+---
+Q: Wat is het doel van eindejaarsverrichtingen en met welk principe hangt dit samen?
+A:
+Eindejaarsverrichtingen zorgen ervoor dat kosten en opbrengsten correct aan de juiste periode worden toegewezen en dat balansposten correct gewaardeerd zijn op afsluitdatum. Dit hangt vooral samen met het **toerekeningsprincipe** en het **overeenstemmingsprincipe (matching)**.
+
+---
+Q: Leg uit waarom voorraadwijzigingen geboekt worden en wat het effect is op resultatenrekening én balans.
+A:
+Voorraadwijzigingen worden geboekt omdat aankopen tijdens het jaar niet noodzakelijk gelijk zijn aan verkochte goederen in datzelfde jaar. Via de voorraadcorrectie wordt de kost van verkochte goederen correct gematcht met de gerealiseerde verkopen. Effect:
+- **Resultatenrekening**: kosten worden aangepast (COGS correct)
+- **Balans**: voorraadpost wordt verhoogd of verlaagd tot de correcte eindvoorraad
+
+---
+Q: Wat zijn afschrijvingen en waarom zijn ze geen kasstromen?
+A:
+Afschrijvingen zijn een boekhoudkundige techniek waarbij de aanschafwaarde van een vast actief met beperkte levensduur gespreid als kost wordt opgenomen over meerdere boekjaren, in lijn met het matchingprincipe. Ze zijn **geen kasstromen** omdat de cash-uitgave bij aankoop plaatsvindt; de jaarlijkse afschrijving is een **niet-kaskost** die enkel het resultaat beïnvloedt.
+
+---
+Q: Wat zijn overlopende rekeningen en waarom zijn ze belangrijk voor het resultaat?
+A:
+Overlopende rekeningen zorgen ervoor dat kosten en opbrengsten in het juiste boekjaar terechtkomen ondanks timingverschillen in betaling/ontvangst.
+- **Overlopende rekeningen (actief)**: vooruitbetaalde kosten / nog te ontvangen opbrengsten
+- **Overlopende rekeningen (passief)**: te betalen kosten / ontvangen opbrengsten die op volgende periode slaan  
+Ze zijn belangrijk omdat ze het resultaat corrigeren volgens accrual en matching.
+
+---
+Q: Wat betekent “contextuele analyse” en waarom is die noodzakelijk vóór cijferanalyse?
+A:
+Contextuele analyse is de voorbereidende fase waarbij je cijfers kadert met sector- en ondernemingsinformatie (sector, businessmodel, historiek, groepsstructuur, waarderingsregels, waarborgen…). Ze is noodzakelijk omdat dezelfde ratio of evolutie in verschillende sectoren/bedrijven een andere betekenis kan hebben; analyse zonder context leidt snel tot foute conclusies.
+
+---
+Q: Wat is horizontale analyse en wat is het doel ervan?
+A:
+Horizontale analyse is een tijdanalyse: je onderzoekt de evolutie van jaarrekeningposten doorheen de tijd (bv. via tijdindexen). Doel: trends en veranderingen detecteren, maar met voorzichtigheid (representativiteit basisjaar, vergelijkbaarheid, teken/negatieve cijfers).
+
+---
+Q: Wat is verticale analyse en wat is het doel ervan?
+A:
+Verticale analyse is een structuuranalyse: je drukt posten uit als percentage van een referentie (bv. balanstotaal voor balans, omzet voor resultatenrekening). Doel: inzicht krijgen in de samenstelling (gewicht) van activa/passiva en kostenstructuur binnen één jaar, en vergelijking mogelijk maken tussen ondernemingen/sectoren.
+
+---
+Q: Waarom wordt de jaarrekening “herwerkt” voor analyse en wat is het netto bedrijfskapitaal (NBK)?
+A:
+De wettelijke jaarrekening is niet altijd analysevriendelijk, daarom worden posten herschikt in analysecategorieën (bv. permanente financiering vs korte termijn). Het **netto bedrijfskapitaal (NBK)** is een buffermaatstaf die aangeeft in welke mate kortlopende verplichtingen gedekt zijn door vlottende middelen:
+- **NBK = Beperkte vlottende activa – Vreemd vermogen op korte termijn**
+of equivalent:
+- **NBK = Permanent vermogen – Uitgebreide vaste activa**
+Een positieve NBK wijst doorgaans op een gezondere korte-termijnstructuur.
+
+---
+Q: Wat is het verschil tussen “vlottend” en “vast” (activa) in één examenzin?
+A:
+Vlottende activa zijn activa die normaal binnen één jaar omgezet worden in cash (voorraad, vorderingen, cash), terwijl vaste activa bedoeld zijn om langdurig in de onderneming te blijven en opbrengsten over meerdere jaren te ondersteunen (gebouwen, machines).
+
+---
+Q: Wat is het verschil tussen “vreemd vermogen” en “eigen vermogen” in één examengerichte uitleg?
+A:
+**Eigen vermogen** is financiering door de eigenaars (kapitaal, reserves, overgedragen resultaat) en hoeft in principe niet terugbetaald te worden. **Vreemd vermogen** is financiering door derden (schulden) en moet terugbetaald worden volgens afgesproken voorwaarden; het creëert vaste verplichtingen (bv. interest en aflossing).
+
+
+## Chapter: Kasstromenanalyse [kasstromen]
+
+Q: Wat is het doel van kasstromenanalyse en waarom is dit anders dan het boekhoudkundig resultaat analyseren?
+A:
+Kasstromenanalyse heeft als doel inzicht te verwerven in de **effectieve inkomende en uitgaande kasstromen** (cash ontvangsten en cash uitgaven) en dus in de **verandering van de kaspositie** over een periode. Dit verschilt van het boekhoudkundig resultaat omdat dat resultaat beïnvloed wordt door **accruals** (toerekenings-, realisatie- en matchingprincipes) en dus niet-kaselementen kan bevatten (bv. afschrijvingen, overlopende posten).
+
+---
+Q: Leg uit wat bedoeld wordt met “resultaat ≠ kasstroom” en geef twee typische oorzaken.
+A:
+Resultaat ≠ kasstroom omdat winst/verlies boekhoudkundig wordt bepaald op basis van periodes en niet op basis van cashbewegingen. Twee typische oorzaken:
+- **Niet-kaskosten/-opbrengsten** (bv. afschrijvingen, voorzieningen) beïnvloeden resultaat maar niet de cash.
+- **Timingverschillen in werkkapitaal** (bv. klanten betalen later → vorderingen stijgen; leveranciers worden later betaald → schulden stijgen).
+
+---
+Q: Wat is de basisdefinitie van “kaspositie” in deze cursuscontext?
+A:
+De verandering in kaspositie wordt benaderd als:
+- **Δ kaspositie = Δ geldbeleggingen + Δ liquide middelen**
+Met andere woorden: je analyseert hoe de som van geldbeleggingen en cash (liquide middelen) evolueert over een periode.
+
+---
+Q: Welke drie categorieën van kasstromen worden traditioneel onderscheiden? Leg elk kort uit.
+A:
+- **Kasstromen uit operationele activiteiten**: cash uit de kernactiviteiten (verkopen, aankopen, lonen, belastingen…).
+- **Kasstromen uit investeringsactiviteiten**: cash door aankoop/verkoop van investeringsgoederen (machines, gebouwen…).
+- **Kasstromen uit financieringsactiviteiten**: cash door transacties met vermogensverschaffers (leningen aangaan/aflossen, kapitaalinbreng, dividenden…).
+
+---
+Q: Geef per categorie een typisch voorbeeld van een inkomende en een uitgaande kasstroom.
+A:
+- **Operationeel**: inkomend = ontvangsten van klanten; uitgaand = betaling leveranciers, lonen, belastingen.
+- **Investeringen**: inkomend = verkoop machine; uitgaand = aankoop machine/gebouw.
+- **Financiering**: inkomend = nieuwe lening of kapitaalinbreng; uitgaand = kapitaalaflossing lening of dividendbetaling.
+
+---
+Q: Wat is het verschil tussen de directe en indirecte methode voor kasstromenanalyse?
+A:
+- **Directe methode**: vertrekt van **effectieve ontvangsten en uitgaven** (cash in – cash uit) en berekent rechtstreeks de netto kasstroom per categorie.
+- **Indirecte methode**: vertrekt van een **boekhoudkundig resultaat** en reconcilieert dit naar kasstroom via correcties voor niet-kaselementen en veranderingen in operationele balansposten (werkkapitaal).
+
+---
+Q: Waarom wordt de indirecte methode vaak gebruikt in oefeningen/examens?
+A:
+Omdat de indirecte methode rechtstreeks aansluit bij gegevens uit de jaarrekening: ze gebruikt het boekhoudkundig resultaat en corrigeert op basis van afschrijvingen en veranderingen in balansposten. Daardoor kan je kasstromen afleiden met informatie die vaak beschikbaar is, zonder elke individuele cashtransactie te reconstrueren.
+
+---
+Q: Beschrijf de indirecte methode in één examenzin.
+A:
+De indirecte methode vertrekt van het **resultaat van het boekjaar** en corrigeert dit voor **niet-kaselementen** en **wijzigingen in operationele vlottende activa en operationele schulden** om de kasstroom uit operationele activiteiten te bekomen.
+
+---
+Q: Welke types correcties horen typisch bij de indirecte methode (operationele kasstroom)?
+A:
+Typische correcties zijn:
+- **+ niet-kaskosten** (afschrijvingen, waardeverminderingen, voorzieningen…)
+- **− niet-kasopbrengsten** (waar relevant)
+- **± veranderingen in operationele vlottende activa** (vorderingen, voorraden, overlopende activa)
+- **± veranderingen in operationele schulden** (handelsschulden, belastingen/bezoldigingen/sociale lasten, overlopende passiva)
+Daarnaast kunnen in het schema ook **kosten van schulden** (interest) als correctie voorkomen afhankelijk van het gebruikte startresultaat.
+
+---
+Q: Wat zijn “operationele vlottende activa” en geef voorbeelden.
+A:
+Operationele vlottende activa zijn kortlopende activa die rechtstreeks gelinkt zijn aan de bedrijfsvoering, zoals:
+- **Handelsvorderingen**
+- **Voorraden**
+- **Overlopende rekeningen van het actief**
+Ze representeren middelen die in de operatie “vastzitten” en dus cash kunnen binden.
+
+---
+Q: Wat zijn “operationele schulden” en geef voorbeelden.
+A:
+Operationele schulden zijn kortlopende verplichtingen die voortkomen uit de bedrijfsvoering, zoals:
+- **Handelsschulden**
+- **Schulden m.b.t. belastingen, bezoldigingen en sociale lasten**
+- **Overlopende rekeningen van het passief**
+Ze representeren financiering door de operatie (bv. later betalen aan leveranciers).
+
+---
+Q: Leg de werkkapitaal-denkregels uit voor de indirecte methode (activa vs schulden).
+A:
+- **Toename operationele activa** (bv. vorderingen ↑, voorraden ↑) betekent dat cash “vastzit” → **negatieve correctie** (aftrekken).
+- **Afname operationele activa** betekent cash komt vrij → **positieve correctie** (optellen).
+- **Toename operationele schulden** (bv. handelsschulden ↑) betekent later betalen → cash blijft beschikbaar → **positieve correctie** (optellen).
+- **Afname operationele schulden** betekent afbetaling → cash weg → **negatieve correctie** (aftrekken).
+
+---
+Q: Waarom worden afschrijvingen terug opgeteld in de indirecte methode?
+A:
+Omdat afschrijvingen het boekhoudkundig resultaat verlagen zonder dat er een effectieve cash-uitgave tegenover staat in die periode. Het is een **niet-kaskost**; om van resultaat naar cash te gaan moet je dit effect neutraliseren door afschrijvingen terug op te tellen.
+
+---
+Q: Waar plaats je interestbetalingen en kapitaalaflossingen in kasstromenanalyse?
+A:
+In de cursuslogica:
+- **Interestbetalingen** worden typisch beschouwd als onderdeel van de **operationele kasstromen** (kost van schulden).
+- **Kapitaalaflossingen** behoren tot de **financieringskasstromen** (terugbetaling van principal).
+Belangrijk is dat je interest en aflossing niet door elkaar haalt.
+
+---
+Q: Hoe bepaal je kasstroom uit investeringsactiviteiten via de indirecte benadering?
+A:
+Een vaak gebruikte benadering is:
+- Start van de **toename/afname in vaste activa**
+- Corrigeer voor **afschrijvingen en waardeverminderingen** (omdat die de boekwaarde beïnvloeden zonder cash)
+Het doel is om de cash-impact van investeringen (aankopen/verkoop vaste activa) af te leiden.
+
+---
+Q: Hoe bepaal je kasstroom uit financieringsactiviteiten in de indirecte benadering?
+A:
+Je kijkt naar veranderingen in financieringsbronnen:
+- **Toename in financiële schulden** (leningen) en/of **toename in inbreng** → positieve kasstromen
+- **Kapitaalaflossingen** en andere uitgaande financieringsstromen → negatieve kasstromen
+Daarnaast kan je corrigeren voor interest als die elders werd meegenomen.
+
+---
+Q: Wat is de relatie tussen kasstromenanalyse en liquiditeitsanalyse (ratio’s zoals current ratio/NBK)?
+A:
+Liquiditeitsratio’s geven een momentopname van de dekking van kortlopende verplichtingen, terwijl kasstromenanalyse verklaart **waarom** de cashpositie verandert en of de onderneming effectief cash genereert om verplichtingen te betalen. Een onderneming kan winstgevend lijken maar liquiditeitsproblemen hebben als operationele kasstromen zwak zijn (bv. vorderingen/voorraden stijgen).
+
+---
+Q: Waarom kan een winstgevend bedrijf toch in liquiditeitsproblemen komen?
+A:
+Omdat winst boekhoudkundig is en niet noodzakelijk cash betekent. Als bijvoorbeeld klanten later betalen (vorderingen ↑) of voorraad sterk toeneemt (voorraad ↑), kan cash wegvloeien ondanks een positief resultaat. Ook hoge investeringen of snelle schuldafbouw kunnen cash drukken.
+
+---
+Q: Wat is het verschil tussen “cash ontvangsten/uitgaven” en “opbrengsten/kosten” in de context van kasstromenanalyse?
+A:
+- **Cash ontvangsten/uitgaven** zijn echte geldbewegingen die de liquide middelen beïnvloeden.
+- **Opbrengsten/kosten** zijn boekhoudkundige grootheden die aan periodes worden toegerekend en dus timingcorrecties kunnen bevatten (accruals). Kasstromenanalyse focust op de eerste, niet op de tweede.
+
+---
+Q: Geef een examengerichte uitleg van waarom kasstromenanalyse nuttig is voor besluitvorming.
+A:
+Kasstromenanalyse toont of een onderneming daadwerkelijk cash genereert uit haar kernactiviteiten, hoeveel cash ze investeert, en hoe ze zichzelf financiert. Dit is cruciaal voor beslissingen over solvabiliteit, betalingscapaciteit, investeringen, dividendbeleid en kredietwaardigheid, omdat cash uiteindelijk bepaalt of verplichtingen kunnen worden nagekomen.
+
+
+
+## Chapter: Kost- en Management Accounting [kost-management]
+
+Q: Wat is het doel van kost- en management accounting en hoe verschilt dit van financiële accounting?
+A:
+Kost- en management accounting heeft als doel **interne besluitvorming** te ondersteunen door relevante kosten- en opbrengstinformatie te leveren aan het management. In tegenstelling tot financiële accounting:
+- is het **niet wettelijk vastgelegd**
+- is het **toekomstgericht** i.p.v. historisch
+- is het **context- en beslissingsafhankelijk**
+- focust het niet op externe rapportering, maar op **planning, controle en besluitvorming**
+
+---
+Q: Wat wordt bedoeld met het begrip “kostenobject”?
+A:
+Een kostenobject is **datgene waarvoor men de kost wil bepalen**. Dit kan een product, dienst, project, afdeling, klant of activiteit zijn. Het gekozen kostenobject bepaalt hoe kosten geclassificeerd en toegewezen worden, en is dus cruciaal voor de analyse.
+
+---
+Q: Waarom is het kostenobject zo belangrijk bij kostenanalyse?
+A:
+Omdat **de classificatie van kosten (bv. direct vs indirect)** afhangt van het gekozen kostenobject. Eenzelfde kost kan direct zijn voor het ene kostenobject en indirect voor het andere, waardoor de analyse altijd contextafhankelijk is.
+
+---
+Q: Wat zijn directe kosten? Geef een examengerichte definitie.
+A:
+Directe kosten zijn kosten die **onmiddellijk en zonder verdeelsleutel** aan één specifiek kostenobject kunnen worden toegerekend. Ze zijn rechtstreeks traceerbaar naar het kostenobject waarvoor ze gemaakt worden.
+
+---
+Q: Wat zijn indirecte kosten (overheadkosten)? Geef een examengerichte definitie.
+A:
+Indirecte kosten zijn kosten die **niet rechtstreeks** aan één kostenobject kunnen worden toegerekend omdat ze meerdere kostenobjecten tegelijk ondersteunen. Ze moeten daarom eerst **gealloceerd worden via een verdeelsleutel**.
+
+---
+Q: Geef typische voorbeelden van directe en indirecte kosten.
+A:
+- **Directe kosten**: grondstoffen van een specifiek product, loon van een arbeider die enkel één product maakt  
+- **Indirecte kosten**: huur van het gebouw, energiekosten van de productiehal, loon van de directie, afschrijvingen van machines die meerdere producten maken
+
+---
+Q: Leg uit waarom directe en indirecte kosten geen absolute begrippen zijn.
+A:
+Omdat de classificatie afhangt van het **kostenobject**. Een kost kan direct zijn ten opzichte van een afdeling, maar indirect ten opzichte van een individueel product. Er bestaan dus geen “van nature” directe of indirecte kosten.
+
+---
+Q: Wat is het verschil tussen vaste en variabele kosten?
+A:
+Het verschil heeft betrekking op **het gedrag van kosten bij wijziging van het activiteitenniveau**:
+- **Variabele kosten** veranderen in totaal wanneer het volume verandert
+- **Vaste kosten** blijven in totaal constant bij volume-wijzigingen (binnen het relevante interval)
+
+---
+Q: Geef een examengerichte definitie van variabele kosten.
+A:
+Variabele kosten zijn kosten die **proportioneel variëren met het activiteitenniveau**, waarbij de kost per eenheid constant blijft zolang de productie binnen het relevante interval blijft.
+
+---
+Q: Geef een examengerichte definitie van vaste kosten.
+A:
+Vaste kosten zijn kosten die **in totaal constant blijven** bij veranderingen in het activiteitenniveau, zolang men zich binnen het relevante interval bevindt, maar die per eenheid veranderen naargelang het volume.
+
+---
+Q: Wat wordt bedoeld met het “relevante interval” bij vaste kosten?
+A:
+Het relevante interval is het **activiteitsgebied waarin aannames over kostengedrag geldig blijven**. Buiten dit interval kunnen vaste kosten sprongsgewijs veranderen, bijvoorbeeld door de nood aan extra capaciteit (extra machine, extra gebouw).
+
+---
+Q: Waarom is het onderscheid tussen vaste en variabele kosten belangrijk voor managementbeslissingen?
+A:
+Omdat het management beslissingen neemt over productievolume, prijszetting en rendabiliteit. Deze beslissingen vereisen inzicht in:
+- welke kosten meeveranderen met het volume
+- welke kosten onafhankelijk zijn van het volume
+Dit onderscheid ligt aan de basis van break-evenanalyse en contributiemarge.
+
+---
+Q: Wat is contributiemarge en waarom is dit een kernbegrip?
+A:
+De contributiemarge is het deel van de omzet dat overblijft na aftrek van de variabele kosten:
+- **Contributiemarge = Omzet – Variabele kosten**
+Ze geeft weer hoeveel een product of activiteit bijdraagt aan het dekken van vaste kosten en vervolgens aan de winst.
+
+---
+Q: Wat is de contributiemarge per eenheid?
+A:
+De contributiemarge per eenheid is:
+- **CM per eenheid = Verkoopprijs per eenheid – Variabele kost per eenheid**
+Deze maatstaf is essentieel voor beslissingen rond productievolume, prijszetting en productmix.
+
+---
+Q: Wat is het break-evenpunt (kritische afzet)?
+A:
+Het break-evenpunt is het activiteitenniveau waarbij:
+- **Totale opbrengsten = Totale kosten**
+en de winst dus gelijk is aan nul. Op dit punt zijn de vaste kosten exact gedekt door de contributiemarge.
+
+---
+Q: Geef de formule voor de kritische afzet en leg ze conceptueel uit.
+A:
+- **Kritische afzet = Vaste kosten / Contributiemarge per eenheid**
+Conceptueel betekent dit dat men voldoende eenheden moet verkopen zodat de totale contributiemarge groot genoeg is om alle vaste kosten te dekken.
+
+---
+Q: Wat is de kritische omzet?
+A:
+De kritische omzet is de omzet die overeenkomt met het break-evenpunt en kan worden berekend als:
+- **Kritische omzet = Kritische afzet × Verkoopprijs**
+of via de contributiemargeratio.
+
+---
+Q: Wat is de contributiemargeratio en waarvoor wordt ze gebruikt?
+A:
+De contributiemargeratio is:
+- **CM-ratio = Contributiemarge / Omzet**
+Ze geeft aan welk percentage van de omzet beschikbaar is om vaste kosten te dekken en winst te genereren, en wordt vaak gebruikt bij omzet-gebaseerde analyses.
+
+---
+Q: Wat is de operationele hefboom en wat meet deze?
+A:
+De operationele hefboom meet hoe **gevoelig het bedrijfsresultaat is voor veranderingen in het verkoopvolume**. Ze weerspiegelt de verhouding tussen vaste en variabele kosten in de kostenstructuur.
+
+---
+Q: Wat is het effect van een hoge operationele hefboom?
+A:
+Een hoge operationele hefboom betekent:
+- veel vaste kosten
+- sterke winststijging bij volumetoename
+- maar ook sterke winstdaling (of verlies) bij volumedaling  
+Met andere woorden: **hoog potentieel, maar ook hoog risico**.
+
+---
+Q: Geef een conceptuele definitie van operationele hefboom.
+A:
+De operationele hefboom drukt uit in welke mate een kleine wijziging in het verkoopvolume leidt tot een relatief grotere wijziging in het bedrijfsresultaat, als gevolg van de aanwezigheid van vaste kosten.
+
+---
+Q: Waarom is kost- en management accounting per definitie contextafhankelijk?
+A:
+Omdat kosteninformatie wordt aangepast aan het **beslissingsdoel**, het gekozen kostenobject en de relevante tijdshorizon. Er bestaat geen “juiste” kost in absolute zin; enkel een **relevante kost** in functie van de beslissing.
+
+---
+Q: Wat is het verschil tussen relevante en irrelevante kosten in beslissingscontext?
+A:
+- **Relevante kosten**: kosten die veranderen als gevolg van de beslissing
+- **Irrelevante kosten**: kosten die niet beïnvloed worden door de beslissing (bv. sunk costs)  
+Management accounting focust uitsluitend op relevante kosten.
+
+---
+Q: Waarom zijn sunk costs niet relevant in management accounting?
+A:
+Sunk costs zijn kosten die reeds gemaakt zijn en niet meer kunnen worden teruggedraaid. Omdat ze **onafhankelijk zijn van toekomstige beslissingen**, mogen ze geen rol spelen in rationele besluitvorming.
+
+---
+Q: Geef een examengerichte samenvatting van het nut van kost- en management accounting.
+A:
+Kost- en management accounting ondersteunt het management bij het nemen van economische beslissingen door inzicht te geven in kostenstructuur, rendabiliteit, risico en volumeeffecten, en vormt zo een essentiële basis voor planning, controle en strategische keuzes.
+
+
+## Chapter: Investeren & Tijdwaarde van Geld [investeren-tijdwaarde]
+
+Q: Wat is het doel van investeringsanalyse binnen ingenieur en economie?
+A:
+Het doel van investeringsanalyse is beoordelen of een investeringsproject **waarde creëert voor de onderneming en haar aandeelhouders**, door toekomstige kasstromen te vergelijken met de initiële investering, rekening houdend met risico en tijdwaarde van geld.
+
+---
+Q: Waarom worden investeringsbeslissingen genomen op basis van kasstromen en niet op basis van boekhoudkundige winst?
+A:
+Omdat boekhoudkundige winst beïnvloed wordt door niet-kaselementen (zoals afschrijvingen en overlopende posten) en door toerekeningsregels. Kasstromen daarentegen geven de **reële geldstromen** weer die beschikbaar zijn voor investeerders en schuldeisers en zijn daarom de correcte basis voor investeringsbeslissingen.
+
+---
+Q: Leg het principe van de tijdwaarde van geld uit in één examengerichte zin.
+A:
+Het principe van de tijdwaarde van geld stelt dat **één euro vandaag meer waard is dan één euro in de toekomst**, omdat geld vandaag kan worden belegd, interest kan opbrengen en omdat toekomstige ontvangsten onzeker zijn.
+
+---
+Q: Wat is de toekomstige waarde (future value) en wat is de algemene formule?
+A:
+De toekomstige waarde is de waarde die een bedrag vandaag zal hebben op een toekomstig tijdstip wanneer het wordt gekapitaliseerd aan een bepaalde interestvoet:
+- **FV = V₀ · (1 + r)ᵗ**
+
+---
+Q: Wat is de contante waarde (present value) en waarom is dit concept cruciaal?
+A:
+De contante waarde is de waarde **vandaag** van een bedrag dat men pas in de toekomst ontvangt. Dit concept is cruciaal omdat investeringsbeslissingen vereisen dat alle kasstromen naar **éénzelfde tijdstip (meestal t = 0)** worden herleid om ze correct te kunnen vergelijken.
+- **PV = Vₜ / (1 + r)ᵗ**
+
+---
+Q: Hoe ga je om met meerdere kasstromen gespreid in de tijd bij investeringsanalyse?
+A:
+Elke kasstroom wordt **afzonderlijk verdisconteerd** naar het gekozen referentietijdstip (meestal vandaag), waarna alle contante waarden worden opgeteld. Enkel zo kan men de totale waarde van een project correct bepalen.
+
+---
+Q: Wat is een annuïteit en in welke context komt dit voor?
+A:
+Een annuïteit is een **eindige reeks gelijke kasstromen** die op regelmatige tijdstippen plaatsvinden (bv. jaarlijkse ontvangsten of betalingen). Annuïteiten komen typisch voor bij leningen, contracten en investeringsprojecten met stabiele jaarlijkse kasstromen.
+
+---
+Q: Wat is een perpetuïteit?
+A:
+Een perpetuïteit is een **oneindige reeks gelijke kasstromen**. De contante waarde ervan kan worden berekend als:
+- **PV = C / r**
+Perpetuïteiten komen vooral theoretisch voor, maar zijn conceptueel belangrijk.
+
+---
+Q: Wat is de netto actuele waarde (NAW of NPV)?
+A:
+De netto actuele waarde is het verschil tussen de som van de contante waarden van alle toekomstige kasstromen en de initiële investering:
+- **NAW = Σ [CFₜ / (1 + r)ᵗ]**
+Ze meet hoeveel waarde een project vandaag creëert of vernietigt.
+
+---
+Q: Wat is de beslissingsregel bij de netto actuele waarde?
+A:
+- **NAW ≥ 0** → investering creëert waarde → aanvaarden  
+- **NAW < 0** → investering vernietigt waarde → verwerpen
+
+---
+Q: Wat stelt de verdisconteringsvoet r voor in investeringsanalyse?
+A:
+De verdisconteringsvoet r stelt het **minimaal vereiste rendement** voor van de vermogensverschaffers en weerspiegelt zowel de tijdsvoorkeur als het risico van het project. Dit wordt ook de **opportuniteitskost van kapitaal** genoemd.
+
+---
+Q: Wat wordt bedoeld met opportuniteitskost in de context van investeringen?
+A:
+De opportuniteitskost is het rendement dat investeerders zouden kunnen behalen door hun middelen in een **alternatieve investering met gelijkaardig risico** te plaatsen. Dit vormt de ondergrens voor het vereiste rendement van een project.
+
+---
+Q: Waarom speelt risico een rol in investeringsanalyse?
+A:
+Omdat toekomstige kasstromen onzeker zijn. Hoe groter het risico van een project, hoe hoger het vereiste rendement en dus hoe hoger de verdisconteringsvoet waarmee kasstromen worden geactualiseerd.
+
+---
+Q: Wat is WACC en waarom wordt deze gebruikt?
+A:
+WACC (Weighted Average Cost of Capital) is het **gewogen gemiddelde van de kosten van eigen en vreemd vermogen** en wordt gebruikt als verdisconteringsvoet wanneer een project gefinancierd wordt met een combinatie van beide. Het weerspiegelt het gemiddelde vereiste rendement van alle kapitaalverschaffers.
+
+---
+Q: Waarom worden financieringskasstromen niet opgenomen in de NAW-berekening?
+A:
+Omdat de kost van financiering reeds vervat zit in de verdisconteringsvoet (r of WACC). Het opnemen van financieringskasstromen zou leiden tot **dubbele telling**.
+
+---
+Q: Wat zijn relevante kasstromen in investeringsanalyse?
+A:
+Relevante kasstromen zijn **incrementele kasstromen** die uitsluitend optreden als gevolg van het investeringsproject en die verdwijnen wanneer het project niet wordt uitgevoerd.
+
+---
+Q: Wat zijn incrementele kasstromen?
+A:
+Incrementele kasstromen zijn kasstromen die **veranderen door de beslissing** om het project al dan niet uit te voeren. Enkel deze kasstromen zijn relevant voor investeringsanalyse.
+
+---
+Q: Wat zijn sunk costs en waarom zijn ze niet relevant?
+A:
+Sunk costs zijn kosten die reeds gemaakt zijn en niet meer kunnen worden teruggedraaid. Omdat ze onafhankelijk zijn van de investeringsbeslissing, mogen ze geen rol spelen in de evaluatie van projecten.
+
+---
+Q: Wat zijn opportuniteitskosten en geef een typisch voorbeeld.
+A:
+Opportuniteitskosten zijn kasstromen die men misloopt door een bepaald alternatief niet te kiezen. Bijvoorbeeld: het gebruik van een eigen gebouw voor een project impliceert het mislopen van een mogelijke verkoop- of huurinkomst, wat als kost moet worden meegenomen.
+
+---
+Q: Hoe ga je om met restwaarde van een investering in de analyse?
+A:
+De restwaarde wordt opgenomen als een **kasstroom op het einde van de looptijd**, waarbij rekening moet worden gehouden met eventuele belastingen op meer- of minderwaarde bij verkoop.
+
+---
+Q: Hoe moet inflatie consistent behandeld worden in investeringsanalyse?
+A:
+Men moet consistent werken:
+- ofwel **reële kasstromen** verdisconteren met een **reële rente**
+- ofwel **nominale kasstromen** verdisconteren met een **nominale rente**
+Het mengen van beide leidt tot foute resultaten.
+
+---
+Q: Wat is de terugverdienperiode en waarom is dit een zwak investeringscriterium?
+A:
+De terugverdienperiode meet hoe snel de initiële investering wordt terugverdiend, maar:
+- negeert de tijdwaarde van geld
+- negeert kasstromen na de terugverdientijd  
+Daarom is het een zwak criterium en ondergeschikt aan NAW.
+
+---
+Q: Geef een examengerichte samenvatting van investeringsanalyse.
+A:
+Investeringsanalyse beoordeelt projecten op basis van hun vermogen om waarde te creëren, door toekomstige incrementele kasstromen te actualiseren aan een risico-aangepaste verdisconteringsvoet en deze te vergelijken met de initiële investering, waarbij de netto actuele waarde het primaire beslissingscriterium is.
