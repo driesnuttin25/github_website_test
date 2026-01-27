@@ -2425,3 +2425,289 @@ Daarom is het een zwak criterium en ondergeschikt aan NAW.
 Q: Geef een examengerichte samenvatting van investeringsanalyse.
 A:
 Investeringsanalyse beoordeelt projecten op basis van hun vermogen om waarde te creëren, door toekomstige incrementele kasstromen te actualiseren aan een risico-aangepaste verdisconteringsvoet en deze te vergelijken met de initiële investering, waarbij de netto actuele waarde het primaire beslissingscriterium is.
+
+
+# Course: Communication Networks [communication-networks]
+
+## Chapter: OSI vs Internet Model – Layer Mapping [osi-mapping]
+
+Q: Waar situeert HTTP zich in het lagenmodel?
+A:
+- OSI-model: Applicatielaag (Layer 7)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert FTP zich in het lagenmodel?
+A:
+- OSI-model: Applicatielaag (Layer 7)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert SMTP (e-mail) zich in het lagenmodel?
+A:
+- OSI-model: Applicatielaag (Layer 7)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert DNS zich in het lagenmodel?
+A:
+- OSI-model: Applicatielaag (Layer 7)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert TCP zich in het lagenmodel?
+A:
+- OSI-model: Transportlaag (Layer 4)
+- Internet (TCP/IP) model: Transportlaag
+
+---
+Q: Waar situeert UDP zich in het lagenmodel?
+A:
+- OSI-model: Transportlaag (Layer 4)
+- Internet (TCP/IP) model: Transportlaag
+
+---
+Q: Waar situeert poortnummers (port numbers) zich?
+A:
+- OSI-model: Transportlaag (Layer 4)
+- Internet (TCP/IP) model: Transportlaag
+
+---
+Q: Waar situeert IP (IPv4 / IPv6) zich in het lagenmodel?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Netwerklaag
+
+---
+Q: Waar situeert ICMP zich in het lagenmodel?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Netwerklaag
+
+---
+Q: Waar situeert routing zich (padbepaling)?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Netwerklaag
+
+---
+Q: Waar situeert Ethernet zich in het lagenmodel?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert WiFi (802.11) zich in het lagenmodel?
+A:
+- OSI-model: Datalinklaag (Layer 2) + Fysieke laag (Layer 1)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert MAC-adressering zich?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert ARP zich?
+A:
+- OSI-model: Tussen Datalinklaag (Layer 2) en Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Linklaag (interface met Netwerklaag)
+
+---
+Q: Waar situeert framing zich (frames maken)?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert foutdetectie via CRC zich?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert bits-overdracht (signalen) zich?
+A:
+- OSI-model: Fysieke laag (Layer 1)
+- Internet (TCP/IP) model: Fysieke laag
+
+---
+Q: Waar situeert kabels, spanningen en frequenties zich?
+A:
+- OSI-model: Fysieke laag (Layer 1)
+- Internet (TCP/IP) model: Fysieke laag
+
+---
+Q: Waar situeert de presentatie van data (compressie, encryptie) zich?
+A:
+- OSI-model: Presentatielaag (Layer 6)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert sessiebeheer zich (sessies openen/sluiten)?
+A:
+- OSI-model: Sessielaag (Layer 5)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert HTTPS zich in het lagenmodel?
+A:
+- OSI-model: Applicatielaag (Layer 7)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert TLS / SSL zich?
+A:
+- OSI-model: Presentatielaag (Layer 6)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert DHCP zich?
+A:
+- OSI-model: Applicatielaag (Layer 7)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert SNMP zich?
+A:
+- OSI-model: Applicatielaag (Layer 7)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert Telnet zich?
+A:
+- OSI-model: Applicatielaag (Layer 7)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert SSH zich?
+A:
+- OSI-model: Applicatielaag (Layer 7)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert RTP (Real-time Transport Protocol) zich?
+A:
+- OSI-model: Transportlaag (Layer 4)
+- Internet (TCP/IP) model: Transportlaag
+
+---
+Q: Waar situeert QUIC zich?
+A:
+- OSI-model: Transportlaag (Layer 4)
+- Internet (TCP/IP) model: Transportlaag
+
+---
+Q: Waar situeert IGMP zich?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Netwerklaag
+
+---
+Q: Waar situeert OSPF zich?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Netwerklaag
+
+---
+Q: Waar situeert RIP zich?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Netwerklaag
+
+---
+Q: Waar situeert BGP zich?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Applicatielaag
+
+---
+Q: Waar situeert NAT zich?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Netwerklaag
+
+---
+Q: Waar situeert MPLS zich?
+A:
+- OSI-model: Tussen Datalinklaag (Layer 2) en Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Tussen Linklaag en Netwerklaag
+
+---
+Q: Waar situeert PPP zich?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert VLAN (802.1Q) zich?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert STP (Spanning Tree Protocol) zich?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert CSMA/CD zich?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert CSMA/CA zich?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert Bluetooth zich?
+A:
+- OSI-model: Fysieke laag (Layer 1) + Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert LTE / 4G zich?
+A:
+- OSI-model: Fysieke laag (Layer 1) + Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert een switch zich?
+A:
+- OSI-model: Datalinklaag (Layer 2)
+- Internet (TCP/IP) model: Linklaag
+
+---
+Q: Waar situeert een router zich?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Netwerklaag
+
+---
+Q: Waar situeert een hub zich?
+A:
+- OSI-model: Fysieke laag (Layer 1)
+- Internet (TCP/IP) model: Fysieke laag
+
+---
+Q: Waar situeert packet forwarding zich?
+A:
+- OSI-model: Netwerklaag (Layer 3)
+- Internet (TCP/IP) model: Netwerklaag
+
+---
+Q: Waar situeert congestion control zich?
+A:
+- OSI-model: Transportlaag (Layer 4)
+- Internet (TCP/IP) model: Transportlaag
+
+---
+Q: Waar situeert flow control zich?
+A:
+- OSI-model: Transportlaag (Layer 4)
+- Internet (TCP/IP) model: Transportlaag
