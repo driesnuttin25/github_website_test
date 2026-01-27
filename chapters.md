@@ -2711,3 +2711,1321 @@ Q: Waar situeert flow control zich?
 A:
 - OSI-model: Transportlaag (Layer 4)
 - Internet (TCP/IP) model: Transportlaag
+
+
+## Chapter: Layered Model [layered-model]
+
+Q: Waarom wordt een gelaagd model gebruikt in netwerken?
+A:
+- Netwerkcommunicatie is zeer complex
+- Complexiteit wordt opgesplitst in afzonderlijke lagen
+- Elke laag heeft een duidelijk afgebakende taak
+- Lagen interfereren niet met elkaars werking
+
+---
+Q: Wat is het belangrijkste voordeel van een gelaagde architectuur?
+A:
+- Elke laag kan onafhankelijk aangepast of vervangen worden
+- Meerdere implementaties van dezelfde laag zijn mogelijk
+- Onderhoud en uitbreiding worden eenvoudiger
+
+---
+Q: Hoeveel lagen telt het OSI-model?
+A:
+- Het OSI-model bestaat uit 7 lagen
+
+---
+Q: Wat is het doel van het OSI-model?
+A:
+- Theoretisch referentiemodel voor netwerkcommunicatie
+- Richtlijn voor ontwerp en analyse van netwerken
+- Niet elk netwerk implementeert alle lagen
+
+---
+Q: Welke OSI-lagen zijn puur theoretisch en vaak niet expliciet geïmplementeerd?
+A:
+- Presentatielaag (Layer 6)
+- Sessielaag (Layer 5)
+
+---
+Q: Wat is de hoofdtaak van de fysieke laag?
+A:
+- Overdracht van ruwe bits
+- Elektrische, optische of draadloze signaaltransmissie
+- Vastleggen van spanningsniveaus en timing
+
+---
+Q: Welke topologieën bestaan op de fysieke laag?
+A:
+- Point-to-point (P2P)
+- Bus
+- Ring
+- Ster (star)
+
+---
+Q: Geef voorbeelden van P2P-communicatie op de fysieke laag.
+A:
+- SPI
+- RS232
+- USB
+
+---
+Q: Welke protocollen gebruiken een bustopologie?
+A:
+- I2C
+- CAN
+- RS485
+- Fieldbus
+
+---
+Q: Welke topologie gebruikt Ethernet?
+A:
+- Stertopologie (star)
+
+---
+Q: Wat regelt de datalinklaag?
+A:
+- Toegang tot het medium
+- Framing van data
+- Foutdetectie
+- Afspreken van datasnelheid
+
+---
+Q: Hoe krijgen deelnemers toegang tot het medium zonder elkaar te storen?
+A:
+- Via start-stop bits
+- Via medium access protocols
+- Via multiple access protocollen
+
+---
+Q: Hoe wordt foutdetectie uitgevoerd op de datalinklaag?
+A:
+- Parity checks
+- Checksums
+- Cyclic Redundancy Check (CRC)
+
+---
+Q: Wat is parity checking?
+A:
+- Toevoegen van een parity-bit
+- Detecteert enkel 1-bit fouten
+- Kan geen fouten corrigeren
+
+---
+Q: Wat is het verschil tussen one-dimensional en two-dimensional parity?
+A:
+- One-dimensional: enkel foutdetectie
+- Two-dimensional: beperkte foutcorrectie (FEC)
+
+---
+Q: Hoe werkt een checksum?
+A:
+- Data wordt opgeteld in vaste bitlengte
+- Ones’ complement van de som wordt toegevoegd
+- Ontvanger controleert of de totale som nul is
+
+---
+Q: Wat is CRC (Cyclic Redundancy Check)?
+A:
+- Data wordt modulo gedeeld door een generatorpolynoom
+- De rest vormt de CRC
+- Zeer betrouwbare foutdetectie
+
+---
+Q: Waarom is CRC sterker dan parity of checksum?
+A:
+- Detecteert meerdere bitfouten
+- Detecteert burst errors
+- Gebaseerd op wiskundige eigenschappen
+
+---
+Q: Wat is een broadcast link?
+A:
+- Meerdere nodes delen hetzelfde medium
+- Data wordt naar alle nodes uitgezonden
+- Kans op botsingen
+
+---
+Q: Wat is het collision-probleem?
+A:
+- Meerdere nodes zenden tegelijk
+- Data raakt beschadigd
+- Hertransmissie is nodig
+
+---
+Q: Welke drie groepen multiple-access protocollen bestaan er?
+A:
+- Channel partitioning protocols
+- Random access protocols
+- Taking turns protocols
+
+---
+Q: Wat is Time Division Multiplexing (TDM)?
+A:
+- Elke node krijgt een vast tijdslot
+- Geen botsingen
+- Inefficiënt bij lage belasting
+
+---
+Q: Wat is Frequency Division Multiplexing (FDM)?
+A:
+- Bandbreedte wordt opgesplitst in frequentiebanden
+- Elke node gebruikt een vaste frequentie
+
+---
+Q: Wat is CDMA?
+A:
+- Alle nodes zenden tegelijk
+- Elke node gebruikt een unieke code
+- Ontvanger filtert gewenste data
+
+---
+Q: Wat is (slotted) ALOHA?
+A:
+- Nodes zenden willekeurig
+- Botsingen mogelijk
+- Slotted ALOHA beperkt botsingen tot tijdsloten
+
+---
+Q: Wat is CSMA?
+A:
+- Node luistert eerst naar het kanaal
+- Zendt alleen als het kanaal vrij is
+
+---
+Q: Wat is CSMA/CD?
+A:
+- Collision Detection
+- Botsingen worden tijdens transmissie gedetecteerd
+- Transmissie wordt afgebroken en herhaald
+
+---
+Q: Wat zijn taking-turns protocollen?
+A:
+- Nodes krijgen om de beurt toegang tot het medium
+- Geen botsingen
+- Mogelijk inefficiënt bij veel nodes
+
+---
+Q: Geef voorbeelden van taking-turns protocollen.
+A:
+- Bluetooth (master polling)
+- Token Ring
+- FDDI
+
+
+## Chapter: Internet Stack [internet-stack]
+
+Q: Waarom zijn protocollen nodig in netwerken?
+A:
+- Om transmissie over het netwerk te controleren
+- Om data te encoderen in elektrische/optische signalen
+- Om fouten te detecteren en herstellen
+- Om data te verpakken, adresseren en routeren
+- Om betrouwbare end-to-end communicatie mogelijk te maken
+
+---
+Q: Welk protocol stack wordt voornamelijk gebruikt op het Internet?
+A:
+- De TCP/IP protocol stack
+
+---
+Q: Hoe verhoudt het Internet Stack model zich tot het OSI-model?
+A:
+- Het Internet Stack model heeft 5 lagen
+- Het is een vereenvoudiging van het 7-lagen OSI-model
+- Presentatie- en sessielaag vallen onder de applicatielaag
+
+---
+Q: Welke lagen bevat het Internet Stack model?
+A:
+- Applicatielaag
+- Transportlaag
+- Netwerklaag
+- Linklaag
+- Fysieke laag
+
+---
+Q: Wat is de taak van de applicatielaag in het Internet Stack model?
+A:
+- Bepaalt hoe applicaties het netwerk gebruiken
+- Voorbeelden: web browsing, e-mail, file transfer
+- PDU heet een message
+
+---
+Q: Geef voorbeelden van applicatielaagprotocollen.
+A:
+- HTTP
+- FTP
+- SMTP
+- DNS
+
+---
+Q: Wat is de taak van de transportlaag?
+A:
+- Biedt end-to-end communicatie tussen applicaties
+- Kan betrouwbaar of onbetrouwbaar zijn
+- Kan connection-oriented of connection-less zijn
+- PDU heet een segment
+
+---
+Q: Welke transportlaagprotocollen worden het meest gebruikt?
+A:
+- TCP
+- UDP
+
+---
+Q: Wat is het verschil tussen TCP en UDP op conceptueel niveau?
+A:
+- TCP: betrouwbaar en connection-oriented
+- UDP: onbetrouwbaar en connection-less
+
+---
+Q: Wat is de taak van de netwerklaag?
+A:
+- Zorgt voor forwarding van pakketten door het netwerk
+- Regelt logische adressering
+- Bepaalt routing over meerdere netwerken
+- PDU heet een datagram
+
+---
+Q: Welk protocol is het belangrijkste in de netwerklaag?
+A:
+- IP (Internet Protocol)
+
+---
+Q: Geef voorbeelden van netwerklaagprotocollen.
+A:
+- IP
+- ICMP
+- IGMP
+
+---
+Q: Wat is de taak van de linklaag?
+A:
+- Communicatie tussen twee direct verbonden nodes
+- Zorgt voor framing
+- Kan betrouwbare transmissie bieden
+- PDU heet een frame
+
+---
+Q: Geef voorbeelden van linklaagprotocollen.
+A:
+- Ethernet
+- WiFi
+- PPP
+
+---
+Q: Wat is encapsulation?
+A:
+- Het proces waarbij elke laag zijn eigen header toevoegt
+- Data wordt stap voor stap verpakt bij het verzenden
+- Omgekeerd uitgepakt bij ontvangst
+
+---
+Q: In welke volgorde gebeurt encapsulation bij verzenden?
+A:
+- Applicatie → Transport → Netwerk → Link → Fysiek
+
+---
+Q: Hoe heten de protocol data units (PDU’s) per laag?
+A:
+- Applicatielaag: message
+- Transportlaag: segment
+- Netwerklaag: datagram
+- Linklaag: frame
+
+---
+Q: Wat gebeurt er met encapsulation tijdens routing?
+A:
+- Enkel de linklaag en fysieke laag veranderen per hop
+- IP-datagram blijft hetzelfde
+- Source en destination hebben de volledige stack
+
+---
+Q: Welke lagen zijn typisch geïmplementeerd op een router?
+A:
+- Netwerklaag
+- Linklaag
+- Fysieke laag
+
+---
+Q: Welke lagen zijn typisch geïmplementeerd op een switch?
+A:
+- Linklaag
+- Fysieke laag
+
+---
+Q: Welke lagen zijn typisch geïmplementeerd op een hub of repeater?
+A:
+- Enkel de fysieke laag
+
+---
+Q: Welke netwerklaag-adressen worden gebruikt voor routing?
+A:
+- IP-adressen (logische adressen)
+
+---
+Q: Welke adressen worden gebruikt op de linklaag?
+A:
+- MAC-adressen (fysieke adressen)
+
+---
+Q: Welke identificatie wordt gebruikt op de transportlaag?
+A:
+- Poortnummers (sockets)
+
+---
+Q: Waarom zegt men dat source en destination de volledige stack implementeren?
+A:
+- Zij draaien applicaties
+- Zij verwerken alle lagen van applicatie tot fysiek
+- Tussentoestellen verwerken slechts een subset
+
+
+## Chapter: Link Layer [link-layer]
+
+Q: Wat is de hoofdtaak van de link layer?
+A:
+- Versturen van frames tussen direct verbonden nodes (1 hop)
+- Framing van pakketten tot een vaste (maximale) lengte
+- Regelen van link access
+- Foutdetectie en soms foutcorrectie
+- Soms betrouwbare overdracht
+
+---
+Q: Wat betekent “1 hop” communicatie?
+A:
+- Communicatie tussen twee direct verbonden nodes
+- Geen end-to-end communicatie
+- Enkel binnen hetzelfde fysieke of logische netwerksegment
+
+---
+Q: Wat doet framing in de link layer?
+A:
+- Pakket wordt ingekapseld in een frame
+- Frame heeft een maximale grootte
+- Nodig voor correcte overdracht en foutdetectie
+
+---
+Q: Wat wordt bedoeld met link access?
+A:
+- Bepalen wie wanneer het medium mag gebruiken
+- Gebruik van extra signalen zoals RTS en CTS
+- Gebruik van MAC-adressen
+
+---
+Q: Wat is Ethernet?
+A:
+- Link layer protocol voor LAN-netwerken
+- Geen betrouwbare levering of hertransmissie
+- Gebruikt MAC-adressen voor adressering
+
+---
+Q: Welke communicatietypes ondersteunt Ethernet?
+A:
+- Unicast: één zender naar één ontvanger
+- Broadcast: één zender naar alle ontvangers
+- Multicast: één zender naar meerdere ontvangers
+
+---
+Q: Wat wordt bedoeld met auto-negotiation in Ethernet?
+A:
+- Automatisch afspreken van transmissiesnelheid
+- Automatisch bepalen van duplexmodus
+- Onderdeel van de fysieke laag
+
+---
+Q: Wat is auto-MDI-X?
+A:
+- Automatische detectie van straight of crossover kabel
+- Geen manuele kabelkeuze nodig
+- Werkt met moderne netwerkinterfaces
+
+---
+Q: Wat is het verschil tussen straight-through en crossover kabels?
+A:
+- Straight-through: PC naar switch
+- Crossover: PC naar PC of PC naar router
+- Auto-MDI-X maakt dit verschil meestal irrelevant
+
+---
+Q: Wat is een MAC-adres?
+A:
+- Link layer adres
+- 48-bit (6 byte) adres
+- Hexadecimale notatie
+- Wereldwijd uniek
+
+---
+Q: Hoe is een MAC-adres opgebouwd?
+A:
+- Eerste 3 bytes: OUI (IEEE-fabrikant)
+- Laatste 3 bytes: uniek apparaatnummer
+
+---
+Q: Wat is het broadcast MAC-adres?
+A:
+- FF-FF-FF-FF-FF-FF
+- Wordt gebruikt om alle nodes te bereiken
+
+---
+Q: Wat bevat de Ethernet frame structuur?
+A:
+- Preamble (8 bytes)
+- Destination MAC-adres
+- Source MAC-adres
+- Type (EtherType)
+- Payload
+- CRC (FCS)
+
+---
+Q: Wat is de functie van het EtherType veld?
+A:
+- Geeft aan welk netwerklaagprotocol wordt gebruikt
+- Voorbeelden:
+  - 0x0800: IPv4
+  - 0x86DD: IPv6
+  - 0x0806: ARP
+
+---
+Q: Wat is de payloadgrootte van een Ethernet frame?
+A:
+- Minimum: 46 bytes
+- Maximum: 1500 bytes (MTU)
+
+---
+Q: Wat is een link layer switch?
+A:
+- Verbindt Ethernet-apparaten binnen een LAN
+- Transparant voor hosts en routers
+- Niet adresseerbaar op IP-niveau
+
+---
+Q: Wat betekent dat een switch “transparent” is?
+A:
+- Hosts en routers weten niet dat frames via een switch gaan
+- Switch werkt onzichtbaar op de link layer
+
+---
+Q: Hoe beslist een switch waar een frame naartoe moet?
+A:
+- Via forwarding en filtering
+- Op basis van MAC-adressen
+- Met behulp van een self-learning algorithm
+
+---
+Q: Wat doet het self-learning algorithm van een switch?
+A:
+- Onthoudt welke MAC-adressen op welke poort zitten
+- Bouwt automatisch een MAC-adrestabel op
+
+---
+Q: Wat is ARP (Address Resolution Protocol)?
+A:
+- Interface tussen netwerklaag en link layer
+- Zet IP-adressen om naar MAC-adressen
+- Nodig voor lokale communicatie
+
+---
+Q: Hoe werkt ARP in grote lijnen?
+A:
+- ARP request wordt gebroadcast
+- Node met juiste IP antwoordt met MAC-adres
+- Zender kan daarna data versturen
+
+---
+Q: Wat is een VLAN?
+A:
+- Logische segmentatie van een LAN
+- Creëert aparte broadcastdomeinen
+- Verbetert prestaties en beveiliging
+
+---
+Q: Hoe kan VLAN-membership worden bepaald?
+A:
+- Statisch: poort-gebaseerd
+- Dynamisch:
+  - MAC-adres
+  - IP-adres
+  - Login of credentials
+
+---
+Q: Wat is trunking?
+A:
+- Verbinden van VLAN’s over meerdere switches
+- Frames bevatten extra VLAN-informatie
+- Hogere lagen zijn zich hier niet van bewust
+
+---
+Q: Wat is VLAN tagging?
+A:
+- Uitbreiding van het MAC-header
+- Standaard: IEEE 802.1Q
+- Voegt 4 bytes toe aan het frame
+
+---
+Q: Welke informatie bevat een 802.1Q tag?
+A:
+- Protocol ID: 0x8100 (2 bytes)
+- Control info:
+  - 4 bit flags
+  - 12 bit VLAN ID (max. 4096 VLAN’s)
+
+---
+Q: Wat is DOCSIS?
+A:
+- Data-Over-Cable Service Interface Specification
+- Gebruikt in kabelnetwerken
+- Downstream: one-to-many
+- Upstream: many-to-one
+
+---
+Q: Welke multiple-access technieken gebruikt DOCSIS?
+A:
+- FDM voor up- en downstream kanalen
+- TDM-achtig systeem voor upstream
+- CSMA/CD voor request frames
+- Taking-turns protocol voor dataframes
+
+
+## Chapter: Network Layer [network-layer]
+
+Q: Wat is de hoofdtaak van de network layer?
+A:
+- End-to-end forwarding van datagrams over meerdere netwerken
+- Logische adressering van hosts en routers
+- Routing en padselectie tussen bron en bestemming
+
+---
+Q: Welke protocollen behoren tot de network layer?
+A:
+- IP (IPv4 en IPv6)
+- ICMP
+- IGMP
+
+---
+Q: Is de network layer connection-oriented of connection-less?
+A:
+- Connection-less
+- Elk datagram wordt onafhankelijk behandeld
+
+---
+Q: Wat betekent packet switching?
+A:
+- Data wordt opgesplitst in pakketten
+- Elk pakket kan een ander pad volgen
+- Geen vaste verbinding tussen bron en bestemming
+
+---
+Q: Wat is het verschil tussen forwarding en routing?
+A:
+- Forwarding: lokale beslissing in een router (welke outputpoort)
+- Routing: globaal bepalen van het beste pad end-to-end
+
+---
+Q: Wat bevat een router intern?
+A:
+- Input ports
+- Output ports
+- Switching fabric
+- Routing processor (control plane)
+
+---
+Q: Wat is een forwarding table?
+A:
+- Tabel die bepaalt via welke interface een pakket wordt doorgestuurd
+- Gebaseerd op bestemmingsadres en subnetmasker
+
+---
+Q: Hoe worden adressen opgeslagen in een forwarding table?
+A:
+- Als prefixen (CIDR-notatie)
+- In adresbereiken per outputinterface
+
+---
+Q: Welke regel geldt bij meerdere matches in een forwarding table?
+A:
+- Longest prefix match wint
+
+---
+Q: Wat is queuing in routers?
+A:
+- Buffers voor pakketten wanneer outputinterface bezet is
+- Kan input queuing of output queuing zijn
+
+---
+Q: Wat is head-of-line blocking?
+A:
+- Probleem bij input queuing
+- Eerste pakket blokkeert andere pakketten, ook al kunnen die vooruit
+
+---
+Q: Wat is het IPv4 datagram formaat?
+A:
+- 20 byte vaste header (+ optionele opties)
+- Maximale grootte: 64 KB
+- Ingekapseld in een Ethernet frame
+
+---
+Q: Welke belangrijke velden zitten in de IPv4 header?
+A:
+- Version
+- Header length
+- Total length
+- Identification, flags, fragment offset
+- TTL
+- Protocol
+- Header checksum
+- Source en destination IP
+
+---
+Q: Wat doet het TTL-veld?
+A:
+- Wordt bij elke hop verlaagd
+- Voorkomt oneindige loops
+- Bij TTL = 0 wordt het pakket gedropt
+
+---
+Q: Wat is IP-fragmentatie?
+A:
+- Opsplitsen van een IP-datagram wanneer MTU te klein is
+- Alleen de eindontvanger herstelt de fragmenten
+
+---
+Q: Wanneer gebeurt IP-fragmentatie?
+A:
+- Wanneer IP-datagram groter is dan de MTU van de link layer
+
+---
+Q: Welke informatie wordt gebruikt om fragmenten te herkennen?
+A:
+- Identification
+- Fragment offset
+- Flags
+
+---
+Q: Wat is een subnet?
+A:
+- Groep IP-adressen met dezelfde netwerkprefix
+- Hosts binnen een subnet communiceren direct
+
+---
+Q: Wat is het verschil tussen direct en indirect routing?
+A:
+- Direct routing: bron en bestemming in hetzelfde subnet
+- Indirect routing: verkeer gaat via een router
+
+---
+Q: Welke rol speelt ARP bij direct routing?
+A:
+- Vertaalt IP-adres naar MAC-adres
+- Nodig om het frame lokaal te verzenden
+
+---
+Q: Wat is CIDR?
+A:
+- Classless InterDomain Routing
+- Notatie met prefixlengte (bv. /24)
+- Flexibel subnetten mogelijk
+
+---
+Q: Hoeveel hosts zijn mogelijk in een /24 netwerk?
+A:
+- 256 adressen totaal
+- 254 bruikbare hosts (zonder netwerk- en broadcastadres)
+
+---
+Q: Welke IPv4-adressen zijn gereserveerd?
+A:
+- 0.0.0.0 : this host
+- Netwerkadres (alle hostbits 0)
+- Broadcastadres (alle hostbits 1)
+- 127.0.0.1 : loopback
+
+---
+Q: Wat is een routing protocol?
+A:
+- Protocol om forwarding tables automatisch op te bouwen
+- Bepaalt beste paden door het netwerk
+
+---
+Q: Welke twee types routingalgoritmen bestaan er?
+A:
+- Link State (bv. OSPF)
+- Distance Vector (bv. BGP)
+
+---
+Q: Wat is het verschil tussen OSPF en BGP?
+A:
+- OSPF: binnen één Autonomous System
+- BGP: tussen verschillende Autonomous Systems
+
+---
+Q: Wat is een Autonomous System (AS)?
+A:
+- Groot netwerk onder één administratief beheer
+- Bijvoorbeeld het netwerk van een ISP
+
+---
+Q: Wat bevat een local forwarding/routing table entry?
+A:
+- Bestemmingsadres + subnetmasker
+- Next hop / gateway
+- Interface
+- Protocol en leeftijd
+- Metric (kost)
+
+---
+Q: Wat is ICMPv4?
+A:
+- Protocol voor fout- en statusmeldingen
+- Wordt altijd teruggestuurd naar de bron
+- Wordt gebruikt door tools zoals traceroute
+
+---
+Q: Hoe werkt traceroute?
+A:
+- Stuurt pakketten met oplopende TTL
+- Routers sturen ICMP Time Exceeded terug
+- Pad door het netwerk wordt zichtbaar
+
+---
+Q: Wat is IPv4 multicast?
+A:
+- Eén zender naar meerdere ontvangers
+- Onbetrouwbare datagramdienst
+- Gebruikt speciale IP-adresrange
+
+---
+Q: Welke IP-range wordt gebruikt voor IPv4 multicast?
+A:
+- 224.0.0.0/4
+
+---
+Q: Hoe wordt een multicast IP-adres vertaald naar een MAC-adres?
+A:
+- Multicast IP → vaste multicast MAC
+- MAC prefix: 01-00-5E
+- 23 bits uit het IP-adres worden gebruikt
+
+---
+Q: Welke rol speelt IGMP bij multicast?
+A:
+- Hosts melden zich aan of af bij multicastgroepen
+- Communicatie tussen hosts en routers
+
+---
+Q: Waarom was IPv6 nodig?
+A:
+- Uitputting van IPv4-adressen
+- Te grote routingtabellen
+- Betere ondersteuning voor nieuwe apparaten
+
+---
+Q: Wat is de grootte van een IPv6-adres?
+A:
+- 128 bits
+- Hexadecimale notatie met dubbele punten
+
+---
+Q: Wat zijn belangrijke verschillen tussen IPv4 en IPv6?
+A:
+- Geen broadcast in IPv6
+- Geen ARP, maar Neighbor Discovery
+- Geen fragmentatie door routers
+- Vast 40 byte header
+
+---
+Q: Welke IPv6-adres types bestaan er?
+A:
+- Global Unicast
+- Unique Local
+- Link-local
+- Multicast
+
+---
+Q: Wat is een link-local IPv6-adres?
+A:
+- Begint met fe80::/10
+- Automatisch toegekend
+- Nooit gerouteerd
+
+---
+Q: Wat is ICMPv6?
+A:
+- Uitgebreide versie van ICMP
+- Bevat Neighbor Discovery
+- Ondersteunt multicast en foutmeldingen
+
+---
+Q: Hoe verloopt de overgang van IPv4 naar IPv6?
+A:
+- Via tunneling
+- IPv6-pakketten worden ingekapseld in IPv4
+
+
+
+## Chapter: Transport Layer [transport-layer]
+
+Q: Wat is de hoofdtaak van de transport layer?
+A:
+- Logische end-to-end communicatie tussen applicaties
+- Inkapselen van applicatiedata
+- Multiplexing en demultiplexing op hosts
+- Betrouwbare datatransfer (optioneel)
+- Congestion control
+
+---
+Q: Wat is het verschil tussen transport layer en network layer?
+A:
+- Transport layer: end-to-end communicatie tussen applicaties
+- Network layer: end-to-end forwarding tussen hosts
+- Transport layer draait enkel op eindhosts
+
+---
+Q: Wat wordt bedoeld met multiplexing in de transport layer?
+A:
+- Meerdere applicaties gebruiken tegelijk het netwerk
+- Identificatie via poortnummers
+- Data wordt correct naar de juiste applicatie gestuurd
+
+---
+Q: Wat is een socket?
+A:
+- Binding tussen IP-adres en poortnummer
+- Identificeert een applicatieproces
+- TCP-verbinding wordt geïdentificeerd door een 4-tuple
+
+---
+Q: Welke 4-tuple identificeert een TCP-verbinding?
+A:
+- Source IP
+- Source port
+- Destination IP
+- Destination port
+
+---
+Q: Welke twee belangrijkste transportlaagprotocollen bestaan er?
+A:
+- TCP
+- UDP
+
+---
+Q: Wat is UDP?
+A:
+- User Datagram Protocol
+- Connection-less
+- Geen betrouwbare overdracht
+- Lage overhead en lage latency
+
+---
+Q: Welke beperkingen heeft UDP?
+A:
+- Geen hertransmissie
+- Geen flow control
+- Segment moet in één IP-datagram passen
+
+---
+Q: Waarvoor wordt UDP typisch gebruikt?
+A:
+- DNS
+- Video- en audiostreaming
+- Applicaties die lage vertraging vereisen
+
+---
+Q: Wat is TCP?
+A:
+- Transmission Control Protocol
+- Betrouwbare datatransfer
+- Connection-oriented
+- Byte-stream interface
+
+---
+Q: Wat betekent “byte-stream interface” bij TCP?
+A:
+- Segmentgrenzen zijn niet zichtbaar voor applicatie
+- Data wordt als continue stroom aangeboden
+- Buffers zorgen voor juiste volgorde
+
+---
+Q: Welke garanties biedt TCP?
+A:
+- Geen packet loss
+- In-sequence delivery
+- Full-duplex communicatie
+- Point-to-point verbinding
+
+---
+Q: Welke mechanismen gebruikt TCP voor betrouwbaarheid?
+A:
+- Sequence numbers
+- Acknowledgments
+- Timeouts
+- Hertransmissie
+
+---
+Q: Wat is de Maximum Segment Size (MSS)?
+A:
+- Maximale hoeveelheid data per TCP-segment
+- Afgeleid van MTU
+- Gecommuniceerd via TCP options
+
+---
+Q: Welke belangrijke velden bevat de TCP header?
+A:
+- Source en destination port
+- Sequence number
+- Acknowledgment number
+- Header length
+- Flags (SYN, ACK, FIN, …)
+- Window size
+- Checksum
+
+---
+Q: Wat is het doel van sequence numbers?
+A:
+- Aanduiden van volgorde van bytes
+- Detecteren van ontbrekende data
+- Ondersteunen van hertransmissie
+
+---
+Q: Wat is het acknowledgment number?
+A:
+- Index van de volgende verwachte byte
+- Cumulatieve bevestiging van ontvangst
+
+---
+Q: Wat is piggybacking in TCP?
+A:
+- ACK wordt meegestuurd met data
+- Efficiënter gebruik van verbinding
+- Mogelijk door full-duplex communicatie
+
+---
+Q: Hoe werkt TCP connection setup?
+A:
+- 3-way handshake
+- SYN → SYN-ACK → ACK
+- Beide kanten initialiseren sequence numbers
+
+---
+Q: Hoe werkt TCP connection teardown?
+A:
+- 4-way handshake
+- FIN en ACK in beide richtingen
+- Beide kanten sluiten onafhankelijk
+
+---
+Q: Wat is flow control?
+A:
+- Bescherming van ontvangende applicatie
+- Receiver adverteert beschikbare buffer
+- Sender beperkt hoeveelheid on-ACK’ed data
+
+---
+Q: Wat is de TCP window size?
+A:
+- Aantal bytes dat zonder ACK mag verstuurd worden
+- Wordt meegestuurd in ACK’s
+- Dynamisch aangepast
+
+---
+Q: Wat is congestion control?
+A:
+- Bescherming van het netwerk
+- Verminderen van verstuursnelheid bij congestie
+- Gebaseerd op netwerkfeedback
+
+---
+Q: Wat zijn tekenen van congestie in TCP?
+A:
+- Toename van RTT
+- Timeouts
+- Duplicate ACK’s
+
+---
+Q: Wat is slow start?
+A:
+- Kleine initiële congestion window
+- Exponentiële groei bij geen congestie
+- Vermijdt plotse overbelasting
+
+---
+Q: Wat is congestion avoidance?
+A:
+- Lineaire groei van congestion window
+- Werken rond optimaal werkpunt
+- Vermijden van packet loss
+
+---
+Q: Hoe bepaalt TCP de effectieve window size?
+A:
+- min(congestion window, flow control window)
+
+---
+Q: Wat is NAT (Network Address Translation)?
+A:
+- Meerdere private IP’s delen één publiek IP
+- Oplossing voor IPv4 adresuitputting
+
+---
+Q: Wat is PAT (Port Address Translation)?
+A:
+- Meerdere interne hosts via één publiek IP
+- Unieke poort per verbinding
+- Meest gebruikte NAT-vorm
+
+---
+Q: Welke private IPv4-adresranges bestaan er?
+A:
+- 10.0.0.0/8
+- 172.16.0.0/12
+- 192.168.0.0/16
+
+---
+Q: Wat doet een NAT translation table?
+A:
+- Houdt mapping bij tussen LAN en WAN
+- IP- en poortvertalingen
+- Kan statisch of dynamisch zijn
+
+---
+Q: Waarom is NAT problematisch voor sommige applicaties?
+A:
+- Inkomende verbindingen zijn niet vanzelf mogelijk
+- Extra configuratie nodig (port forwarding)
+- Breekt end-to-end principe
+
+
+
+## Chapter: Wireless Networks [wireless-networks]
+
+Q: Wat is het verschil tussen ad-hoc en infrastructuurloze netwerken?
+A:
+- Ad-hoc: geen basisstation, communicatie tussen hosts
+- Infrastructuurloos: geen centrale controle
+- Voorbeelden: Bluetooth, Wi-Fi Direct, VANET/V2X
+
+---
+Q: Wat zijn infrastructuur-gebaseerde draadloze netwerken?
+A:
+- Netwerken met een basisstation of access point
+- Ondersteunen handoff/handover
+- Voorbeelden: WiFi, LoRaWAN, GSM, 4G
+
+---
+Q: Waarom wordt een draadloos netwerk een broadcast medium genoemd?
+A:
+- Signalen worden in alle richtingen uitgezonden
+- Alle nodes binnen bereik ontvangen het signaal
+- Geen exclusief communicatiepad
+
+---
+Q: Welke factoren beïnvloeden de kwaliteit van draadloze communicatie?
+A:
+- Afname van signaalsterkte met afstand
+- Interferentie van andere zenders
+- Elektromagnetische ruis
+- Multipath propagation
+
+---
+Q: Wat is het hidden terminal probleem?
+A:
+- Twee zenders horen elkaar niet
+- Zenden tegelijk naar dezelfde ontvanger
+- Botsing bij de ontvanger
+
+---
+Q: Wat is multipath propagation?
+A:
+- Signaal bereikt ontvanger via meerdere paden
+- Reflecties op objecten
+- Kan interferentie en vervorming veroorzaken
+
+---
+Q: Wat is de relatie tussen SNR, BER en modulatie?
+A:
+- Hogere SNR → lagere BER
+- Hogere bitsnelheid bijzelfde SNR → hogere BER
+- Rate adaptation door modulatie te wijzigen
+
+---
+Q: Welk multiple-access protocol gebruikt WiFi?
+A:
+- CSMA/CA (Collision Avoidance)
+
+---
+Q: In welke frequentiebanden werkt WiFi?
+A:
+- 2.4 GHz (13 kanalen in EU)
+- 5 GHz (ongeveer 27 kanalen in EU)
+
+---
+Q: Wat betekent backward compatibility bij WiFi?
+A:
+- Nieuwere standaarden ondersteunen oudere clients
+- Lagere prestaties mogelijk bij gemengde netwerken
+
+---
+Q: Wat is een Basic Service Set (BSS)?
+A:
+- Eén access point met bijhorende clients
+- Basisbouwsteen van een WiFi-netwerk
+
+---
+Q: Wat is een SSID?
+A:
+- Service Set Identifier
+- Naam van het WiFi-netwerk
+- Gebruikt door clients om te verbinden
+
+---
+Q: Hoe detecteert een client een access point?
+A:
+- Via beacon frames van AP
+- Via actieve probe requests van client
+
+---
+Q: Wat is associatie in WiFi?
+A:
+- Proces waarbij client zich verbindt met een AP
+- Gebaseerd op signaalsterkte en capaciteiten
+
+---
+Q: Welke stappen bevat AP-associatie?
+A:
+- Probe request / response
+- Authentication request / response
+- Association request / response
+
+---
+Q: Wat bevat een 802.11 MAC frame?
+A:
+- Frame control
+- Duration
+- MAC-adressen (1 tot 4)
+- Sequence control
+- Payload
+- CRC
+
+---
+Q: Waarom bevat een 802.11 frame meer MAC-adressen dan Ethernet?
+A:
+- Door aanwezigheid van AP en infrastructuur
+- Ondersteuning van wireless distribution system (WDS)
+
+---
+Q: Wat is de functie van RTS/CTS in WiFi?
+A:
+- Reserveren van kanaaltijd
+- Vermijden van hidden terminal probleem
+- Andere clients gaan in back-off
+
+---
+Q: Waarom gebruikt WiFi collision avoidance in plaats van detection?
+A:
+- Botsingen zijn moeilijk detecteerbaar draadloos
+- Zender kan eigen signaal niet goed onderscheiden
+
+---
+Q: Wat gebeurt er als een client geen ACK ontvangt?
+A:
+- Volledig frame wordt opnieuw verzonden
+- Betrouwbaarheid op link layer
+
+---
+Q: Wat is mobility tussen BSS’en?
+A:
+- Verplaatsen van client tussen access points
+- Zonder IP-wijziging binnen hetzelfde subnet
+
+---
+Q: Wat is re-associatie?
+A:
+- Client verbindt met nieuw AP
+- Trigger voor IAPP
+- Sleutels kunnen opnieuw worden uitgewisseld
+
+---
+Q: Hoe wordt MAC-learning in switches geüpdatet bij roaming?
+A:
+- Nieuw AP stuurt broadcast met MAC van client
+- Switch past MAC-tabel aan
+
+---
+Q: Wat is power management in WiFi?
+A:
+- Client kan in slaapstand gaan
+- AP buffert frames
+- Beacon frames geven buffered data aan
+
+---
+Q: Wat zijn de belangrijkste kenmerken van cellular networks?
+A:
+- Grote dekking
+- Packet switched
+- IP-gebaseerd
+- Ondersteunen mobiliteit
+
+---
+Q: In welke frequenties werken 4G en 5G?
+A:
+- 4G: 800 MHz, 1.7 GHz, 2.6 GHz
+- 5G: 0.45–6 GHz en 25–52 GHz
+
+---
+Q: Wat bevat de SIM-kaart in 4G?
+A:
+- IMSI (64-bit subscriber ID)
+- Encryptiesleutel
+
+---
+Q: Wat is de rol van een base station in 4G?
+A:
+- Beheer van radio resources
+- Authenticatie van mobiele toestellen
+- Communicatie met andere base stations
+
+---
+Q: Wat doen MME en HSS?
+A:
+- Authenticatie van gebruikers
+- Verifiëren van IMSI
+- Beheer van mobiliteit en tunnels
+
+---
+Q: Wat is de rol van de Serving Gateway (S-GW)?
+A:
+- Eerste hop in provider netwerk
+- GTP-tunnel met base station
+
+---
+Q: Wat is de rol van de Packet Data Network Gateway (P-GW)?
+A:
+- Toekennen van IP-adres (NAT)
+- Edge router naar het internet
+- GTP-tunnel met S-GW
+
+---
+Q: Waarom gebruikt 4G tunneling?
+A:
+- Behoud van IP-adres bij mobiliteit
+- Transparantie voor internetapplicaties
+- IP-in-IP encapsulation
+
+---
+Q: Hoe verloopt mobility management in 4G?
+A:
+- Contact met foreign base station
+- Authenticatie via home network
+- Tunnel wordt opgezet naar home P-GW
+
+---
+Q: Wat zijn de stappen van een 4G handover?
+A:
+- Selectie van nieuwe base station
+- Reservatie van resources
+- Overdracht van datastroom
+- Update van tunnel via MME en S-GW
+- Afronding zonder packet loss
