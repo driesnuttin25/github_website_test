@@ -1,808 +1,296 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Study Trainer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
+    <title>Our Little Post Office 💌</title>
 
-  <style>
-    .swipe-left  { transform: translateX(-120%) rotate(-6deg); opacity: 0; transition: transform 220ms ease, opacity 220ms ease; }
-    .swipe-right { transform: translateX(120%)  rotate( 6deg); opacity: 0; transition: transform 220ms ease, opacity 220ms ease; }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    .progress-fill { transition: width 400ms ease; }
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
 
-    .dragging { transition: none !important; }
-    .badge {
-      position: absolute;
-      top: 12px;
-      font-weight: 700;
-      padding: 6px 10px;
-      border-radius: 12px;
-      pointer-events: none;
-      opacity: 0;
-      transform: scale(0.95);
-      transition: opacity 120ms ease, transform 120ms ease;
-      user-select: none;
-    }
-    .badge-left  { left: 12px;  background: rgba(244,63,94,0.15);  color: rgb(244,63,94);  border: 1px solid rgba(244,63,94,0.35); }
-    .badge-right { right: 12px; background: rgba(34,197,94,0.15); color: rgb(34,197,94); border: 1px solid rgba(34,197,94,0.35); }
-  </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="h-full bg-zinc-50 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50">
-  <header class="sticky top-0 z-50 bg-white/70 backdrop-blur border-b border-zinc-200 dark:bg-zinc-900/70 dark:border-zinc-800">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <button id="homeBtn" class="flex items-center gap-2 text-zinc-700 dark:text-zinc-200 hover:opacity-80" title="Home (H)">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-          <path d="M11.47 3.84a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 0 1-1.06 1.06l-.9-.9V20a2 2 0 0 1-2 2h-3.25a.75.75 0 0 1-.75-.75V15a.75.75 0 0 0-.75-.75h-2.5A.75.75 0 0 0 9.5 15v6.25a.75.75 0 0 1-.75.75H5.5a2 2 0 0 1-2-2v-7.31l-.9.9a.75.75 0 1 1-1.06-1.06l8.69-8.69Z"/>
-        </svg>
-        <span class="font-semibold">Study Trainer</span>
-      </button>
+<body>
 
-      <div class="flex items-center gap-2">
-        <button id="darkToggle" class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" title="Toggle theme (T)">
-          Toggle Theme
-        </button>
-      </div>
-    </div>
-  </header>
+    <!-- =========================================
+         LANDING PAGE
+    ========================================== -->
 
-  <main id="app" class="max-w-5xl mx-auto px-4 py-6"></main>
+    <main id="home-screen" class="screen active">
 
-  <footer class="max-w-5xl mx-auto px-4 py-10 text-center text-xs text-zinc-500">
-    <p>Swipe left = "Don’t know", right = "I know". Keyboard: ← / →, Space = reveal, H = home, T = theme.</p>
-  </footer>
-
-  <script>
-    const $ = (sel, el=document) => el.querySelector(sel);
-
-    const STORAGE_KEYS = {
-      theme: 'trainer.theme',
-      progress: (courseId, chapterId, mode) => `trainer.progress.${courseId}.${chapterId}.${mode}`,
-      known:   (courseId, chapterId) => `trainer.known.${courseId}.${chapterId}`
-    };
-
-    function setTheme(dark) {
-      const root = document.documentElement;
-      if (dark) { root.classList.add('dark'); localStorage.setItem(STORAGE_KEYS.theme, 'dark'); }
-      else { root.classList.remove('dark'); localStorage.setItem(STORAGE_KEYS.theme, 'light'); }
-    }
-    setTheme(localStorage.getItem(STORAGE_KEYS.theme) === 'dark');
-
-    const State = {
-      data: null
-    };
-
-    const SAMPLE_CHAPTERS = {
-      courses: [
-        { id: 'comp-arch', name: 'Computer Architecture', chapters: [
-          { id: 'internal-memory', name: 'Internal Memory', items: [
-            { q: 'What is a cache hit?', a: 'When the requested data is found in cache.' }
-          ] }
-        ] }
-      ]
-    };
-
-    function slugify(s='') {
-      return s.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
-    }
-    function parseBracketId(line) {
-      const m = line.match(/\[([^\]]+)\]\s*$/);
-      return m ? m[1].trim() : null;
-    }
-    function stripBracketId(line) {
-      return line.replace(/\s*\[[^\]]+\]\s*$/, '').trim();
-    }
-
-    function parseChaptersMD(text) {
-      const lines = text.replace(/\r\n/g, '\n').split('\n');
-
-      const data = { courses: [] };
-      let course = null;
-      let chapter = null;
-
-      let cur = null;
-      let field = null;
-
-      function ensureCourse(name, idHint) {
-        const id = idHint || slugify(name);
-        let c = data.courses.find(x => x.id === id);
-        if (!c) {
-          c = { id, name, chapters: [] };
-          data.courses.push(c);
-        }
-        return c;
-      }
-
-      function ensureChapter(c, name, idHint) {
-        const id = idHint || slugify(name);
-        let ch = c.chapters.find(x => x.id === id);
-        if (!ch) {
-          ch = { id, name, items: [] };
-          c.chapters.push(ch);
-        }
-        return ch;
-      }
-
-      function flushCard() {
-        if (!chapter || !cur) return;
-        const q = (cur.q || '').trim();
-        const a = (cur.a || '').trim();
-        const img = (cur.img || '').trim();
-        if (q || a) chapter.items.push({ q, a, img: img || undefined });
-        cur = null;
-        field = null;
-      }
-
-      for (let i = 0; i < lines.length; i++) {
-        const raw = lines[i];
-        const line = raw.trimEnd();
-        const t = line.trim();
-
-        if (!t) {
-          if (cur && (field === 'q' || field === 'a')) cur[field] += '\n';
-          continue;
-        }
-
-        if (t === '---') { flushCard(); continue; }
-
-        if (t.startsWith('# Course:')) {
-          flushCard();
-          const rest = t.replace('# Course:', '').trim();
-          const idHint = parseBracketId(rest);
-          const name = stripBracketId(rest);
-          course = ensureCourse(name || 'Untitled Course', idHint);
-          chapter = null;
-          continue;
-        }
-
-        if (t.startsWith('## Chapter:')) {
-          flushCard();
-          if (!course) course = ensureCourse('Untitled Course', 'untitled-course');
-          const rest = t.replace('## Chapter:', '').trim();
-          const idHint = parseBracketId(rest);
-          const name = stripBracketId(rest);
-          chapter = ensureChapter(course, name || 'Untitled Chapter', idHint);
-          continue;
-        }
-
-        if (!cur) cur = { q: '', a: '', img: '' };
-
-        if (t.startsWith('Q:')) { field = 'q'; cur.q += t.replace('Q:', '').trim() + '\n'; continue; }
-        if (t.startsWith('A:')) { field = 'a'; cur.a += t.replace('A:', '').trim() + '\n'; continue; }
-        if (t.startsWith('IMG:')) { field = 'img'; cur.img = t.replace('IMG:', '').trim(); continue; }
-
-        if (field === 'q' || field === 'a') cur[field] += line + '\n';
-      }
-
-      flushCard();
-      return data;
-    }
-
-    async function loadData() {
-      try {
-        const res = await fetch('chapters.md', { cache: 'no-store' });
-        if (!res.ok) throw new Error('chapters.md not found');
-        const text = await res.text();
-        const parsed = parseChaptersMD(text);
-        if (!parsed || !Array.isArray(parsed.courses) || !parsed.courses.length) throw new Error('chapters.md empty/invalid');
-        return parsed;
-      } catch (e) {
-        console.warn('Falling back to SAMPLE_CHAPTERS. Reason:', e.message);
-        return SAMPLE_CHAPTERS;
-      }
-    }
-
-    function escapeHtml(str='') {
-      return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s]));
-    }
-
-    function formatCardText(str='') {
-      // 1) escape first (security)
-      let s = escapeHtml(String(str));
-
-      // 2) tiny markdown-ish formatting
-      s = s
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // **bold**
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')             // *italic* (optional)
-        .replace(/\n/g, '<br>');                          // keep newlines
-
-      return s;
-    }
-
-    function escapeAttr(str='') { return String(str).replace(/"/g, '&quot;'); }
-
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-    function hashItems(items) {
-      const s = items.map(it => `${it.q}|${it.a}|${it.img||''}`).join('\u0001');
-      let h = 0;
-      for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-      return h;
-    }
-
-    function getCourseById(id) {
-      return (State.data?.courses || []).find(c => c.id === id);
-    }
-    function getChapterById(course, chapterId) {
-      return (course?.chapters || []).find(ch => ch.id === chapterId);
-    }
-
-    function navigate(hash) {
-      if (location.hash === hash) {
-        route(hash);
-      } else {
-        location.hash = hash;
-      }
-    }
-
-    function parseRoute(rawHash) {
-      const full = (rawHash ?? location.hash).replace(/^#\/?/, '');
-      const [path, queryStr] = full.split('?');
-      const parts = (path || '').split('/').filter(Boolean);
-
-      const query = {};
-      if (queryStr) {
-        queryStr.split('&').forEach(kv => {
-          const [k, v] = kv.split('=');
-          if (!k) return;
-          query[decodeURIComponent(k)] = decodeURIComponent(v || '');
-        });
-      }
-      return { parts, query };
-    }
-
-    function renderHome() {
-      const courses = State.data.courses || [];
-      const cards = courses.map(c => `
-        <button class="group rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 hover:shadow transition bg-white dark:bg-zinc-900"
-                onclick="navigate('#/course/${c.id}')">
-          <div class="aspect-square rounded-xl bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-700 mb-3 flex items-center justify-center">
-            <span class="text-3xl">📚</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="font-semibold">${escapeHtml(c.name)}</h3>
-              <p class="text-sm text-zinc-500">${c.chapters?.length || 0} chapter(s)</p>
-            </div>
-            <span class="opacity-0 group-hover:opacity-100 transition">→</span>
-          </div>
-        </button>
-      `).join('');
-
-      $('#app').innerHTML = `
-        <h1 class="text-2xl font-bold mb-4">Choose a course</h1>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">${cards}</div>
-      `;
-    }
-
-    function renderCourse(courseId) {
-      const course = getCourseById(courseId);
-      if (!course) return renderNotFound();
-
-      const cards = (course.chapters || []).map(ch => `
-        <button class="group rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 hover:shadow transition bg-white dark:bg-zinc-900"
-                onclick="navigate('#/chapter/${course.id}/${ch.id}')">
-          <div class="aspect-square rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-800 dark:to-indigo-700 mb-3 flex items-center justify-center">
-            <span class="text-3xl">🗂️</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="font-semibold">${escapeHtml(ch.name)}</h3>
-              <p class="text-sm text-zinc-500">${ch.items?.length || 0} card(s)</p>
-            </div>
-            <span class="opacity-0 group-hover:opacity-100 transition">→</span>
-          </div>
-        </button>
-      `).join('');
-
-      $('#app').innerHTML = `
-        <div class="flex items-center justify-between mb-4">
-          <h1 class="text-2xl font-bold">${escapeHtml(course.name)}</h1>
-          <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                  onclick="navigate('#/')">Home</button>
-        </div>
-        <p class="text-zinc-500 mb-4">Pick a chapter.</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">${cards}</div>
-      `;
-    }
-
-    function renderChapter(courseId, chapterId) {
-      const course = getCourseById(courseId);
-      const chapter = course && getChapterById(course, chapterId);
-      if (!chapter) return renderNotFound();
-
-      const hasCards = (chapter.items?.length || 0) > 0;
-
-      $('#app').innerHTML = `
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h1 class="text-2xl font-bold">${escapeHtml(chapter.name)}</h1>
-            <p class="text-zinc-500">${escapeHtml(course.name)}</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                    onclick="navigate('#/course/${course.id}')">Back</button>
-            <button class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                    onclick="navigate('#/')">Home</button>
-          </div>
+        <div class="sky-decoration">
+            <span class="cloud cloud-1"></span>
+            <span class="cloud cloud-2"></span>
         </div>
 
-        <div class="grid sm:grid-cols-2 gap-4">
-          <div class="rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-            <h2 class="font-semibold mb-2">In Order</h2>
-            <p class="text-sm text-zinc-500 mb-4">Go through all cards sequentially. Mark known/unknown and track your score.</p>
-            <div class="flex items-center gap-2">
-              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 ${hasCards ? '' : 'opacity-50 cursor-not-allowed'}"
-                      ${hasCards ? `onclick="startQuizRoute('${course.id}','${chapter.id}','order')"` : ''}>Start</button>
-              <label class="inline-flex items-center gap-2 text-sm">
-                <input id="shuffle-order" type="checkbox" class="rounded border-zinc-300"/> Shuffle
-              </label>
-            </div>
-          </div>
+        <section class="home-content">
 
-          <div class="rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-            <h2 class="font-semibold mb-2">Training</h2>
-            <p class="text-sm text-zinc-500 mb-4">Adaptive practice. Wrong cards come back later. Progress reaches 100% only when all are marked known.</p>
-            <div class="flex items-center gap-2">
-              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 ${hasCards ? '' : 'opacity-50 cursor-not-allowed'}"
-                      ${hasCards ? `onclick="startQuizRoute('${course.id}','${chapter.id}','training')"` : ''}>Start</button>
-              <label class="inline-flex items-center gap-2 text-sm">
-                <input id="shuffle-training" type="checkbox" class="rounded border-zinc-300"/> Shuffle
-              </label>
-              <label class="inline-flex items-center gap-2 text-sm">
-                <input id="persist-training" type="checkbox" class="rounded border-zinc-300" checked/> Persist progress
-              </label>
-            </div>
-          </div>
-        </div>
+            <div class="intro">
+                <p class="eyebrow">A little place for us</p>
 
-        ${hasCards ? '' : `<p class="mt-6 text-amber-600 text-sm">This chapter has no cards yet. Add them in <code>chapters.md</code>.</p>`}
-      `;
-    }
+                <h1>Our Little<br><span>Post Office</span></h1>
 
-    function renderNotFound() {
-      $('#app').innerHTML = `
-        <div class="text-center py-16">
-          <p class="text-5xl mb-2">🤔</p>
-          <p class="text-lg">Not found.</p>
-          <button class="mt-4 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" onclick="navigate('#/')">Go Home</button>
-        </div>
-      `;
-    }
-
-    let quiz = null;
-
-    function startQuizRoute(courseId, chapterId, mode) {
-      const shuffle = (mode === 'order' ? $('#shuffle-order')?.checked : $('#shuffle-training')?.checked) ? '1' : '0';
-      const persist = (mode === 'training' ? ($('#persist-training')?.checked ? '1' : '0') : '0');
-      navigate(`#/quiz/${courseId}/${chapterId}/${mode}?shuffle=${shuffle}&persist=${persist}`);
-    }
-
-    function createQuizSession({ course, chapter, items, mode, persist }) {
-      const key = STORAGE_KEYS.progress(course.id, chapter.id, mode);
-      const itemsH = hashItems(items);
-      const savedWrap = JSON.parse(localStorage.getItem(key) || 'null');
-      const saved = (savedWrap && savedWrap.itemsHash === itemsH) ? savedWrap.state : null;
-
-      const knownPersistedSet = new Set(
-        (mode === 'training' && persist)
-          ? (JSON.parse(localStorage.getItem(STORAGE_KEYS.known(course.id, chapter.id)) || '[]') || [])
-          : []
-      );
-
-      const baseQueue = items.map((it, idx) => ({ idx, it }));
-      let queue = baseQueue.filter(c => !(mode === 'training' && persist && knownPersistedSet.has(c.idx)));
-
-      let state = saved ? saved : {
-        mode,
-        courseId: course.id,
-        chapterId: chapter.id,
-        current: 0,
-        reveal: false,
-        queue,
-        knownPersisted: Array.from(knownPersistedSet),
-        knownOnce: [],
-        unknownOnce: []
-      };
-
-      const knownOnceSet = new Set(state.knownOnce || []);
-      const unknownOnceSet = new Set(state.unknownOnce || []);
-
-      function masteredCount() {
-        if (mode !== 'training') return knownOnceSet.size;
-        const s = new Set(state.knownPersisted || []);
-        for (const k of knownOnceSet) s.add(k);
-        return s.size;
-      }
-
-      function persistState() {
-        state.knownOnce = Array.from(knownOnceSet);
-        state.unknownOnce = Array.from(unknownOnceSet);
-        localStorage.setItem(key, JSON.stringify({ itemsHash: itemsH, state }));
-        if (mode === 'training' && persist) {
-          const s = new Set(state.knownPersisted || []);
-          for (const k of knownOnceSet) s.add(k);
-          localStorage.setItem(STORAGE_KEYS.known(course.id, chapter.id), JSON.stringify(Array.from(s)));
-        }
-      }
-
-      function reset(all=false) {
-        localStorage.removeItem(key);
-        if (mode === 'training' && all) localStorage.removeItem(STORAGE_KEYS.known(course.id, chapter.id));
-
-        const kp = (mode === 'training' && persist && !all)
-          ? (JSON.parse(localStorage.getItem(STORAGE_KEYS.known(course.id, chapter.id)) || '[]') || [])
-          : [];
-
-        state = {
-          mode,
-          courseId: course.id,
-          chapterId: chapter.id,
-          current: 0,
-          reveal: false,
-          queue: items.map((it, idx) => ({ idx, it })).filter(c => !(mode === 'training' && persist && new Set(kp).has(c.idx))),
-          knownPersisted: kp,
-          knownOnce: [],
-          unknownOnce: []
-        };
-        knownOnceSet.clear();
-        unknownOnceSet.clear();
-        persistState();
-        renderQuiz();
-      }
-
-      function reveal() {
-        state.reveal = !state.reveal;
-        persistState();
-        renderQuiz();
-      }
-
-      function mark(isKnown, viaSwipe=false) {
-        if (!state.queue.length) return;
-
-        const pos = Math.min(state.current, state.queue.length - 1);
-        const card = state.queue[pos];
-
-        if (mode === 'training') {
-          // remove current card from queue, then decide what to do with it
-          state.queue.splice(pos, 1);
-
-          if (isKnown) {
-            knownOnceSet.add(card.idx);
-            unknownOnceSet.delete(card.idx);
-            // also remove any duplicates if they exist
-            state.queue = state.queue.filter(c => c.idx !== card.idx);
-          } else {
-            unknownOnceSet.add(card.idx);
-            const reinsertionOffset = 4;
-            const insertPos = Math.min(pos + reinsertionOffset, state.queue.length);
-            state.queue.splice(insertPos, 0, card);
-          }
-
-          state.current = Math.min(pos, Math.max(0, state.queue.length - 1));
-        } else {
-          if (isKnown) {
-            knownOnceSet.add(card.idx);
-            unknownOnceSet.delete(card.idx);
-          } else {
-            unknownOnceSet.add(card.idx);
-          }
-          state.current = pos + 1;
-        }
-
-        state.reveal = false;
-        persistState();
-
-        renderQuiz(isKnown ? (viaSwipe ? 'right' : null) : (viaSwipe ? 'left' : null));
-      }
-
-      return {
-        state,
-        reveal,
-        mark,
-        reset,
-        persistState,
-        _sets: { knownOnceSet, unknownOnceSet },
-        masteredCount
-      };
-    }
-
-    function renderQuiz(swipedDirection=null) {
-      const st = quiz.state;
-      const course = getCourseById(st.courseId);
-      const chapter = getChapterById(course, st.chapterId);
-      if (!course || !chapter) return renderNotFound();
-
-      const total = (chapter.items || []).length;
-
-      const mastered = quiz.masteredCount();
-      const remaining = Math.max(0, total - mastered);
-
-      let progressPct = 0;
-      if (total) {
-        if (st.mode === 'training') {
-          progressPct = (mastered / total) * 100;     // ONLY goes to 100% when all known
-        } else {
-          const current = Math.min(st.current, total);
-          progressPct = (current / total) * 100;      // order mode: position through deck
-        }
-      }
-
-      let content = '';
-
-      if (st.mode === 'training' && remaining === 0) {
-        content = `
-          <div class="text-center py-10">
-            <p class="text-5xl mb-3">🎉</p>
-            <p class="text-lg font-semibold mb-1">Training complete</p>
-            <p class="text-sm text-zinc-500 mb-6">Progress is 100% because every card is marked known.</p>
-            <div class="flex items-center justify-center gap-2">
-              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"
-                      onclick="navigate('#/chapter/${course.id}/${chapter.id}')">Back to chapter</button>
-              <button class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700"
-                      onclick="quiz.reset(false)">Reset session</button>
-              <button class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700"
-                      onclick="quiz.reset(true)">Reset ALL (incl persisted)</button>
-            </div>
-          </div>
-        `;
-      } else if (st.mode === 'order' && st.current >= st.queue.length) {
-        content = `
-          <div class="text-center py-10">
-            <p class="text-5xl mb-3">✅</p>
-            <p class="text-lg font-semibold mb-1">End of deck</p>
-            <p class="text-sm text-zinc-500 mb-4">Score: <b>${quiz._sets.knownOnceSet.size}</b> known, <b>${quiz._sets.unknownOnceSet.size}</b> unknown</p>
-            <div class="flex items-center justify-center gap-2">
-              <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"
-                      onclick="quiz.reset(false)">Restart</button>
-              <button class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700"
-                      onclick="navigate('#/chapter/${course.id}/${chapter.id}')">Back</button>
-            </div>
-          </div>
-        `;
-      } else {
-        const pos = Math.min(st.current, st.queue.length - 1);
-        const card = st.queue[pos];
-        const q = card?.it?.q || '(No question)';
-        const a = card?.it?.a || '(No answer)';
-        const img = card?.it?.img || null;
-
-        const knownLabel = (st.mode === 'training') ? mastered : quiz._sets.knownOnceSet.size;
-        const unknownLabel = quiz._sets.unknownOnceSet.size;
-
-        content = `
-          <div class="flex flex-col gap-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <h1 class="text-xl font-bold">
-                  ${escapeHtml(chapter.name)}
-                  <span class="text-sm font-normal text-zinc-500">(${escapeHtml(course.name)})</span>
-                </h1>
-                <p class="text-sm text-zinc-500">Mode: <b>${st.mode === 'order' ? 'In Order' : 'Training'}</b></p>
-              </div>
-
-              <div class="flex items-center gap-2 text-sm">
-                <span class="px-2 py-1 rounded bg-green-600/10 text-green-700 dark:text-green-400">Known: ${knownLabel}</span>
-                <span class="px-2 py-1 rounded bg-rose-600/10 text-rose-700 dark:text-rose-400">Unknown: ${unknownLabel}</span>
-                <span class="px-2 py-1 rounded bg-zinc-600/10">Remaining: ${st.mode === 'training' ? remaining : Math.max(0, total - Math.min(st.current, total))}</span>
-              </div>
+                <p class="intro-text">
+                    Two little mailboxes.<br>
+                    One very special person.
+                </p>
             </div>
 
-            <div class="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-              <div class="h-full bg-indigo-600 progress-fill" style="width:${progressPct.toFixed(1)}%"></div>
-            </div>
+            <div class="mailboxes">
 
-            <div id="card" class="relative rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow p-4 md:p-6 select-none will-change-transform">
-              <div class="badge badge-left">Don’t know</div>
-              <div class="badge badge-right">I know</div>
+                <!-- DRIES -->
+                <button class="mailbox-card" onclick="openMailbox('dries')">
 
-              ${img ? `<img src="${escapeAttr(img)}" alt="" class="w-full max-h-56 object-contain rounded-xl mb-3">` : ''}
+                    <div class="mailbox-name">
+                        Dries
+                    </div>
 
-              <div class="mb-2 text-sm uppercase tracking-wide text-zinc-500">Question</div>
-              <div class="text-lg md:text-xl font-medium">${formatCardText(q)}</div>
+                    <div class="mailbox">
+                        <div class="mailbox-post"></div>
+
+                        <div class="mailbox-body">
+                            <div class="mailbox-handle"></div>
+                            <div class="mailbox-door"></div>
+                            <div class="mailbox-slot"></div>
+                        </div>
+
+                        <div class="mailbox-flag"></div>
+                    </div>
+
+                    <p class="mailbox-label">
+                        Dries' mailbox
+                    </p>
+
+                    <span class="mailbox-hint">
+                        This one's yours
+                    </span>
+
+                </button>
 
 
-              <div class="mt-4 border-t border-zinc-200 dark:border-zinc-800 pt-4">
-                <div class="flex items-center justify-between mb-2">
-                  <div class="text-sm uppercase tracking-wide text-zinc-500">Answer</div>
-                  <button id="revealBtn" class="text-sm px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                    ${st.reveal ? 'Hide' : 'Reveal'} (Space)
-                  </button>
+                <!-- HEART -->
+                <div class="between-mailboxes">
+                    <span>♡</span>
+                    <small>love travels both ways</small>
                 </div>
-                  <div id="answer" class="text-base md:text-lg ${st.reveal ? '' : 'blur-sm select-none'}">${formatCardText(a)}</div>
-              </div>
+
+
+                <!-- MYSS -->
+                <button class="mailbox-card myss-card" onclick="openMailbox('myss')">
+
+                    <div class="mailbox-name">
+                        Myss
+                    </div>
+
+                    <div class="mailbox myss-mailbox" id="home-mailbox">
+
+                        <div class="mailbox-post"></div>
+
+                        <div class="mailbox-body">
+                            <div class="mailbox-handle"></div>
+                            <div class="mailbox-door"></div>
+                            <div class="mailbox-slot"></div>
+                        </div>
+
+                        <div class="mailbox-flag raised" id="home-flag"></div>
+
+                    </div>
+
+                    <p class="mailbox-label">
+                        Myss' mailbox
+                    </p>
+
+                    <span class="mailbox-hint" id="home-mail-hint">
+                        Something might be waiting...
+                    </span>
+
+                </button>
+
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-              <button id="btnNo" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-rose-600 text-white hover:bg-rose-700">
-                <span>← Don’t know</span>
-              </button>
-              <button id="btnYes" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600 text-white hover:bg-green-700">
-                <span>I know →</span>
-              </button>
+            <p class="footer-note">
+                Made with love, wherever we are in the world ♡
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================
+         MAILBOX SCREEN
+    ========================================== -->
+
+    <main id="mailbox-screen" class="screen">
+
+        <div class="mailbox-page">
+
+            <button class="back-button" onclick="goHome()">
+                ← Back
+            </button>
+
+            <header class="mailbox-header">
+
+                <div>
+                    <p class="eyebrow">Private post</p>
+
+                    <h2 id="mailbox-title">
+                        Myss' Mailbox
+                    </h2>
+                </div>
+
+                <div class="mail-count" id="mail-count">
+                    0 letters
+                </div>
+
+            </header>
+
+
+            <!-- NEW MAIL MESSAGE -->
+
+            <div class="new-mail-banner hidden" id="new-mail-banner">
+
+                <span class="mail-icon">✉</span>
+
+                <div>
+                    <strong>You have mail!</strong>
+                    <span id="new-mail-text">
+                        Someone left something for you.
+                    </span>
+                </div>
+
             </div>
 
-            <div class="flex items-center justify-between text-xs text-zinc-500">
-              <div>Hotkeys: ← / → to mark • Space to reveal • H = Home • T = Theme</div>
-              <div class="flex items-center gap-2">
-                <button id="btnBack" class="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700">Back</button>
-                <button id="btnReset" class="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700">Reset</button>
-              </div>
+
+            <!-- LETTER LIST -->
+
+            <section class="letters-section">
+
+                <div class="section-title">
+                    <span>Waiting for you</span>
+                    <div class="little-line"></div>
+                </div>
+
+                <div id="unread-letters" class="letters-list">
+                    <!-- Letters are inserted here by JavaScript -->
+                </div>
+
+
+                <div class="section-title read-section-title" id="read-title">
+
+                    <span>Letters you've opened</span>
+
+                    <div class="little-line"></div>
+
+                </div>
+
+                <div id="read-letters" class="letters-list read-letters">
+                    <!-- Read letters are inserted here -->
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================
+         LETTER VIEWER
+    ========================================== -->
+
+    <div id="letter-overlay" class="letter-overlay">
+
+        <div class="letter-backdrop" onclick="closeLetter()"></div>
+
+        <div class="letter-modal">
+
+            <button class="close-letter" onclick="closeLetter()" aria-label="Close letter">
+                ×
+            </button>
+
+            <!-- ENVELOPE -->
+
+            <div class="envelope-container" id="envelope-container">
+
+                <div class="envelope">
+
+                    <div class="envelope-back"></div>
+
+                    <div class="envelope-letter">
+                        <div class="letter-paper-preview">
+                            <span>For you ♡</span>
+                        </div>
+                    </div>
+
+                    <div class="envelope-front"></div>
+
+                    <div class="envelope-flap"></div>
+
+                    <div class="wax-seal">
+                        <span>♡</span>
+                    </div>
+
+                </div>
+
+                <p class="open-envelope-text">
+                    Click the envelope to open
+                </p>
+
             </div>
-          </div>
-        `;
-      }
 
-      $('#app').innerHTML = content;
 
-      const cardEl = $('#card');
-      if (cardEl && swipedDirection) {
-        cardEl.classList.add(swipedDirection === 'left' ? 'swipe-left' : 'swipe-right');
-        setTimeout(() => cardEl?.classList.remove('swipe-left','swipe-right'), 230);
-      }
+            <!-- ACTUAL LETTER -->
 
-      $('#revealBtn')?.addEventListener('click', () => quiz.reveal());
-      $('#btnNo')?.addEventListener('click', () => quiz.mark(false));
-      $('#btnYes')?.addEventListener('click', () => quiz.mark(true));
-      $('#btnReset')?.addEventListener('click', () => quiz.reset(false));
-      $('#btnBack')?.addEventListener('click', () => navigate(`#/chapter/${quiz.state.courseId}/${quiz.state.chapterId}`));
+            <article class="letter-paper" id="letter-paper">
 
-      const ans = $('#answer');
-      if (ans) {
-        ans.addEventListener('click', (e) => { e.stopPropagation(); quiz.reveal(); });
-        ans.addEventListener('mousedown', (e) => e.stopPropagation());
-        ans.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
-      }
+                <div class="paper-decoration top-decoration">
+                    ✦　♡　✦
+                </div>
 
-      if (cardEl) initSwipePreview(cardEl, {
-        onLeft:  () => quiz.mark(false, true),
-        onRight: () => quiz.mark(true, true)
-      });
-    }
+                <div class="letter-meta">
 
-    function initSwipePreview(el, { onLeft, onRight }) {
-      let startX = 0, startY = 0, dragging = false;
-      let lastDX = 0;
-      const badgeL = el.querySelector('.badge-left');
-      const badgeR = el.querySelector('.badge-right');
+                    <span id="letter-date"></span>
 
-      const commitThreshold = Math.max(60, window.innerWidth * 0.18);
+                    <span class="stamp">
+                        LOVE<br>POST
+                    </span>
 
-      function setPreview(dx) {
-        const damp = Math.min(1, Math.abs(dx) / commitThreshold);
-        const rot = (dx / 20);
-        el.style.transform = `translateX(${dx}px) rotate(${rot}deg)`;
-        el.classList.add('dragging');
+                </div>
 
-        if (dx < 0) {
-          if (badgeL) { badgeL.style.opacity = Math.min(1, damp * 1.2); badgeL.style.transform = `scale(${0.95 + 0.05*damp})`; }
-          if (badgeR) { badgeR.style.opacity = 0; badgeR.style.transform = 'scale(0.95)'; }
-        } else if (dx > 0) {
-          if (badgeR) { badgeR.style.opacity = Math.min(1, damp * 1.2); badgeR.style.transform = `scale(${0.95 + 0.05*damp})`; }
-          if (badgeL) { badgeL.style.opacity = 0; badgeL.style.transform = 'scale(0.95)'; }
-        } else {
-          if (badgeL) badgeL.style.opacity = 0;
-          if (badgeR) badgeR.style.opacity = 0;
-        }
-      }
+                <div class="letter-content">
 
-      function resetPreview() {
-        el.classList.remove('dragging');
-        el.style.transition = 'transform 160ms ease';
-        el.style.transform = '';
-        setTimeout(() => { el.style.transition = ''; }, 170);
-        if (badgeL) badgeL.style.opacity = 0;
-        if (badgeR) badgeR.style.opacity = 0;
-      }
+                    <p class="letter-greeting" id="letter-title"></p>
 
-      el.addEventListener('touchstart', (e) => {
-        const t = e.touches[0];
-        startX = t.clientX; startY = t.clientY;
-        dragging = true; lastDX = 0;
-      }, { passive: true });
+                    <div class="letter-message" id="letter-message"></div>
 
-      el.addEventListener('touchmove', (e) => {
-        if (!dragging) return;
-        const t = e.touches[0];
-        const dx = t.clientX - startX;
-        const dy = t.clientY - startY;
-        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dx) < 10) return;
-        lastDX = dx;
-        setPreview(dx);
-      }, { passive: true });
+                    <div class="letter-signature">
+                        Always yours,<br>
+                        <span>Dries ♡</span>
+                    </div>
 
-      el.addEventListener('touchend', () => {
-        if (!dragging) return;
-        dragging = false;
-        const dx = lastDX;
-        if (Math.abs(dx) > commitThreshold) {
-          if (dx < 0) onLeft && onLeft(); else onRight && onRight();
-        } else resetPreview();
-      });
+                </div>
 
-      let mouseDown = false;
-      el.addEventListener('mousedown', (e) => { mouseDown = true; startX = e.clientX; startY = e.clientY; lastDX = 0; });
-      document.addEventListener('mousemove', (e) => {
-        if (!mouseDown) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dx) < 10) return;
-        lastDX = dx;
-        setPreview(dx);
-      });
-      document.addEventListener('mouseup', () => {
-        if (!mouseDown) return;
-        mouseDown = false;
-        const dx = lastDX;
-        if (Math.abs(dx) > commitThreshold) {
-          if (dx < 0) onLeft && onLeft(); else onRight && onRight();
-        } else resetPreview();
-      });
-    }
+                <div class="paper-decoration bottom-decoration">
+                    ♡
+                </div>
 
-    function route(forcedHash=null) {
-      const { parts, query } = parseRoute(forcedHash);
+            </article>
 
-      // leaving quiz view? clear quiz so it can't "fight" the UI
-      const isQuizRoute = parts[0] === 'quiz';
-      if (!isQuizRoute) quiz = null;
+        </div>
 
-      if (!parts.length) return renderHome();
+    </div>
 
-      if (parts[0] === 'course' && parts[1]) return renderCourse(parts[1]);
-      if (parts[0] === 'chapter' && parts[1] && parts[2]) return renderChapter(parts[1], parts[2]);
 
-      if (parts[0] === 'quiz' && parts[1] && parts[2] && parts[3]) {
-        const courseId = parts[1], chapterId = parts[2], mode = parts[3];
-        const course = getCourseById(courseId);
-        const chapter = course && getChapterById(course, chapterId);
-        if (!course || !chapter) return renderNotFound();
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
 
-        const items = Array.from(chapter.items || []);
-        const shuffle = query.shuffle === '1';
-        const persist = query.persist === '1';
+    <script src="script.js"></script>
 
-        if (shuffle) shuffleArray(items);
-
-        quiz = createQuizSession({ course, chapter, items, mode, persist });
-        window.quiz = quiz;
-        renderQuiz();
-        return;
-      }
-
-      return renderNotFound();
-    }
-
-    $('#homeBtn').addEventListener('click', () => navigate('#/'));
-    $('#darkToggle').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'h' || e.key === 'H') navigate('#/');
-      if (e.key === 't' || e.key === 'T') setTheme(!document.documentElement.classList.contains('dark'));
-
-      if (!quiz) return;
-
-      if (e.code === 'Space') { e.preventDefault(); quiz.reveal(); }
-      if (e.key === 'ArrowLeft')  { e.preventDefault(); quiz.mark(false); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); quiz.mark(true); }
-    });
-
-    (async function init() {
-      State.data = await loadData();
-      window.navigate = navigate;
-      window.startQuizRoute = startQuizRoute;
-      route();
-      window.addEventListener('hashchange', () => route());
-    })();
-  </script>
 </body>
 </html>
